@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kriptografi Testi - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        iframe {
+            border: none;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800/80 backdrop-blur-xl border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-green-400 hover:text-green-300 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold hidden md:inline">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <!-- Hero Section -->
+        <div class="text-center mb-8">
+            <div class="inline-block bg-green-500/20 rounded-full px-4 py-2 mb-4">
+                <span class="text-green-300 font-semibold">📝 Değerlendirme</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Kriptografi Bilgi Testi</h1>
+            <p class="text-xl text-gray-400 max-w-3xl mx-auto mb-6">
+                Öğrendiğiniz kriptografi kavramlarını test edin. Bu test, ASSURE modelinin 
+                "Değerlendirme" aşamasının bir parçasıdır.
+            </p>
+            
+            <!-- Instructions -->
+            <div class="bg-gradient-to-r from-blue-900/30 to-green-900/30 border border-blue-500/30 rounded-2xl p-6 md:p-8 max-w-4xl mx-auto text-left mb-8">
+                <h3 class="text-xl font-bold text-white mb-3 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Test Hakkında
+                </h3>
+                <ul class="space-y-2 text-gray-300">
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 mt-0.5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Tüm modülleri tamamladıktan sonra testi yapmanız önerilir
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 mt-0.5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Sorular steganografi, hash, şifreleme ve kriptografi temellerini kapsar
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 mt-0.5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Testin sonunda puanınızı görebileceksiniz
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 mt-0.5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Hazır olduğunuzda aşağıdaki formu doldurun
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Google Form Link -->
+        <div class="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-2xl p-8 md:p-12 text-center">
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-2xl p-8 mb-6">
+                    <svg class="w-20 h-20 mx-auto mb-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <h2 class="text-2xl font-bold text-white mb-3">Kriptografi Bilgi Testi</h2>
+                    <p class="text-gray-300 mb-6">
+                        Testi başlatmak için aşağıdaki butona tıklayın. Test yeni bir sekmede açılacaktır.
+                    </p>
+                    <a 
+                        href="https://docs.google.com/forms/d/e/1FAIpQLSehyxq_vcB_YAkHFBttttiEDvuduu6ENjAzq1tA_pMOi_nsoA/viewform?usp=header" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                        </svg>
+                        Teste Başla
+                    </a>
+                </div>
+                <p class="text-gray-400 text-sm">
+                    💡 Test Google Forms üzerinde açılacaktır. Testi tamamladıktan sonra bu sayfaya geri dönebilirsiniz.
+                </p>
+            </div>
+        </div>
+
+        <!-- After Test Section -->
+        <div class="mt-8 grid md:grid-cols-2 gap-6">
+            <div class="bg-gradient-to-br from-purple-900/30 to-pink-900/30 border border-purple-500/30 rounded-2xl p-6">
+                <h3 class="text-xl font-bold text-white mb-3 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    Testi Tamamladıktan Sonra
+                </h3>
+                <p class="text-gray-300 mb-4">
+                    Test sonuçlarınızı gözden geçirin ve eksik kaldığınız konuları tekrar edin.
+                </p>
+                <a href="scenario.html" class="inline-flex items-center text-purple-400 hover:text-purple-300 font-semibold">
+                    Senaryoya Dön
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 border border-blue-500/30 rounded-2xl p-6">
+                <h3 class="text-xl font-bold text-white mb-3 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                    Daha Fazla Pratik
+                </h3>
+                <p class="text-gray-300 mb-4">
+                    Bilgilerinizi pekiştirmek için flashcard ve oyunları kullanın.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="flashcards.html" class="inline-flex items-center text-blue-400 hover:text-blue-300 font-semibold text-sm">
+                        Bilgi Kartları →
+                    </a>
+                    <a href="crypto-game.html" class="inline-flex items-center text-cyan-400 hover:text-cyan-300 font-semibold text-sm">
+                        Kripto Oyunu →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 border-t border-gray-800 py-8">
+        <div class="container mx-auto px-4 text-center text-gray-500">
+            <p>© 2025 Zero Trust Kriptografi Akademisi - Eğitim ve Değerlendirme</p>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenim Senaryosu - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .step-card {
+            transition: all 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateX(8px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+        }
+        .completed {
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800/80 backdrop-blur-xl border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-purple-400 hover:text-purple-300 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold hidden md:inline">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <div class="inline-block bg-purple-500/20 rounded-full px-4 py-2 mb-4">
+                <span class="text-purple-300 font-semibold">📚 Öğrenim Senaryosu</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Siber Güvenlik Uzmanı Olmak</h1>
+            <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                Bu senaryo, sizi adım adım kriptografi dünyasına götürecek ve tüm araçları kullanarak 
+                gerçek dünya problemlerini çözmenizi sağlayacak.
+            </p>
+        </div>
+
+        <!-- Scenario Story -->
+        <div class="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 rounded-2xl p-6 md:p-8 mb-8">
+            <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center">
+                <span class="text-4xl mr-3">🎯</span> Senaryo: Gizli Mesajı Çöz
+            </h2>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                <strong class="text-purple-300">Durum:</strong> Güvenlik şirketinde çalışan bir siber güvenlik uzmanısınız. 
+                Şirketinize şüpheli bir USB bellek geldi ve içinde şifrelenmiş dosyalar var. 
+                Müdürünüz sizden bu dosyaları analiz etmenizi ve içeriğini çözmenizi istedi.
+            </p>
+            <p class="text-gray-300 leading-relaxed">
+                <strong class="text-pink-300">Görev:</strong> Aşağıdaki adımları takip ederek gizli mesajı bulun ve 
+                sistemin güvenliğini sağlamak için doğru kriptografik yöntemleri öğrenin.
+            </p>
+        </div>
+
+        <!-- Steps -->
+        <div class="space-y-6">
+            
+            <!-- Step 1 -->
+            <div class="step-card bg-gray-800/50 backdrop-blur border border-gray-700 rounded-2xl p-6 md:p-8">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        1
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-white mb-3">Steganografi - Gizli Mesajı Bul</h3>
+                        <p class="text-gray-400 mb-4">
+                            USB bellekte bulunan masum görünen bir resim dosyası var. Ancak bu resmin içinde gizli bir mesaj olabilir!
+                        </p>
+                        <div class="bg-blue-900/30 border-l-4 border-blue-400 p-4 rounded mb-4">
+                            <p class="text-blue-200 font-semibold mb-2">🎯 Görev:</p>
+                            <ul class="list-disc list-inside text-gray-300 space-y-1">
+                                <li>Steganografi sayfasına gidin</li>
+                                <li>Bir resim seçin ve içine "SALDIRI 14:00'TE BAŞLAYACAK" mesajını gizleyin</li>
+                                <li>Şifrelenmiş resmi kaydedin</li>
+                                <li>Şimdi aynı resimden mesajı çıkarın</li>
+                            </ul>
+                        </div>
+                        <a href="sten.html" class="inline-flex items-center bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg transition">
+                            Steganografi Aracına Git
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card bg-gray-800/50 backdrop-blur border border-gray-700 rounded-2xl p-6 md:p-8">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        2
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-white mb-3">Hash - Dosya Bütünlüğünü Kontrol Et</h3>
+                        <p class="text-gray-400 mb-4">
+                            USB'deki dosyaların değiştirilip değiştirilmediğini kontrol etmeniz gerekiyor. Hash fonksiyonları ile dosya bütünlüğünü doğrulayın.
+                        </p>
+                        <div class="bg-green-900/30 border-l-4 border-green-400 p-4 rounded mb-4">
+                            <p class="text-green-200 font-semibold mb-2">🎯 Görev:</p>
+                            <ul class="list-disc list-inside text-gray-300 space-y-1">
+                                <li>Hash sayfasına gidin</li>
+                                <li>"Güvenli Dosya İçeriği" metninin SHA-256 hash'ini oluşturun</li>
+                                <li>Hash değerini kaydedin</li>
+                                <li>Parola güvenlik simülatöründe "12345" gibi zayıf parolaları test edin</li>
+                            </ul>
+                        </div>
+                        <a href="hash.html" class="inline-flex items-center bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg transition">
+                            Hash Aracına Git
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card bg-gray-800/50 backdrop-blur border border-gray-700 rounded-2xl p-6 md:p-8">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        3
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-white mb-3">Sezar Şifresi - Basit Şifreyi Çöz</h3>
+                        <p class="text-gray-400 mb-4">
+                            Bir not defteri dosyasında Sezar şifresi ile şifrelenmiş bir mesaj var: "ULVN DQDOLCL"
+                        </p>
+                        <div class="bg-yellow-900/30 border-l-4 border-yellow-400 p-4 rounded mb-4">
+                            <p class="text-yellow-200 font-semibold mb-2">🎯 Görev:</p>
+                            <ul class="list-disc list-inside text-gray-300 space-y-1">
+                                <li>Sezar şifresi sayfasına gidin</li>
+                                <li>"ULVN DQDOLCL" mesajını çözün (farklı kaydırma değerlerini deneyin)</li>
+                                <li>Doğru mesajı bulduğunuzda not edin</li>
+                            </ul>
+                        </div>
+                        <a href="caesar.html" class="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-3 rounded-lg transition">
+                            Sezar Şifresine Git
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card bg-gray-800/50 backdrop-blur border border-gray-700 rounded-2xl p-6 md:p-8">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        4
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-white mb-3">RSA - Güvenli İletişim Kur</h3>
+                        <p class="text-gray-400 mb-4">
+                            Müdürünüze güvenli bir şekilde rapor göndermeniz gerekiyor. RSA ile şifreleyin!
+                        </p>
+                        <div class="bg-purple-900/30 border-l-4 border-purple-400 p-4 rounded mb-4">
+                            <p class="text-purple-200 font-semibold mb-2">🎯 Görev:</p>
+                            <ul class="list-disc list-inside text-gray-300 space-y-1">
+                                <li>RSA sayfasına gidin</li>
+                                <li>Anahtar çifti oluşturun</li>
+                                <li>"Tehdit bertaraf edildi" mesajını şifreleyin</li>
+                                <li>Şifreli mesajı çözün</li>
+                            </ul>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="rsa.html" class="inline-flex items-center justify-center bg-purple-500 hover:bg-purple-600 text-white font-semibold px-6 py-3 rounded-lg transition">
+                                🚀 Hızlı RSA Aracı
+                                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                </svg>
+                            </a>
+                            <a href="rsa-step1.html" class="inline-flex items-center justify-center bg-purple-700 hover:bg-purple-800 text-white font-semibold px-6 py-3 rounded-lg transition border-2 border-purple-400/50">
+                                📚 RSA Adım Adım Öğren
+                                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="step-card bg-gray-800/50 backdrop-blur border border-gray-700 rounded-2xl p-6 md:p-8">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        5
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-white mb-3">Bilginizi Test Edin</h3>
+                        <p class="text-gray-400 mb-4">
+                            Tüm adımları tamamladınız mı? Şimdi bilginizi test etme zamanı!
+                        </p>
+                        <div class="bg-pink-900/30 border-l-4 border-pink-400 p-4 rounded mb-4">
+                            <p class="text-pink-200 font-semibold mb-2">🎯 Görev:</p>
+                            <ul class="list-disc list-inside text-gray-300 space-y-1">
+                                <li>Flashcard ile kavramları öğrenin</li>
+                                <li>Kripto oyunu ile eğlenirken öğrenin</li>
+                                <li>Test sayfasından sınavınızı yapın</li>
+                            </ul>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <a href="flashcards.html" class="inline-flex items-center bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-6 py-3 rounded-lg transition">
+                                Bilgi Kartları
+                            </a>
+                            <a href="crypto-game.html" class="inline-flex items-center bg-pink-500 hover:bg-pink-600 text-white font-semibold px-6 py-3 rounded-lg transition">
+                                Kripto Oyunu
+                            </a>
+                            <a href="test.html" class="inline-flex items-center bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg transition">
+                                Testi Başlat
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Success Message -->
+        <div class="mt-12 bg-gradient-to-r from-green-900/30 to-blue-900/30 border border-green-500/30 rounded-2xl p-6 md:p-8 text-center">
+            <div class="text-5xl mb-4">🎉</div>
+            <h3 class="text-2xl font-bold text-white mb-3">Tebrikler!</h3>
+            <p class="text-gray-300 max-w-2xl mx-auto">
+                Bu senaryoyu tamamladığınızda, steganografi, hash fonksiyonları, simetrik ve asimetrik 
+                şifreleme konularında pratik deneyim kazanmış olacaksınız. Artık siber güvenlik dünyasına 
+                bir adım daha yakınsınız! 🚀
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 border-t border-gray-800 py-8">
+        <div class="container mx-auto px-4 text-center text-gray-500">
+            <p>© 2025 Zero Trust Kriptografi Akademisi - Eğitim Amaçlı Platform</p>
+        </div>
+    </footer>
+
+</body>
+</html>

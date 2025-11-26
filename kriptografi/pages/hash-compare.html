@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Algoritmaları Karşılaştırma - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-red-400 hover:text-red-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                    
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+
+        <!-- Info Section -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 mb-8 border border-gray-700">
+            <h2 class="text-3xl font-bold text-white mb-4">🔐 Hash Algoritmaları Nedir?</h2>
+            <div class="text-gray-300 space-y-3">
+                <p>
+                    <strong>Hash fonksiyonları</strong>, herhangi bir boyuttaki veriyi sabit uzunlukta bir değere 
+                    (hash) dönüştüren tek yönlü matematiksel fonksiyonlardır.
+                </p>
+                <div class="bg-gray-900 rounded-lg p-4 my-4">
+                    <h3 class="font-semibold text-red-400 mb-2">Hash Özellikleri:</h3>
+                    <ul class="list-disc list-inside space-y-2 text-sm">
+                        <li><strong>Deterministic:</strong> Aynı girdi her zaman aynı hash'i üretir</li>
+                        <li><strong>Hızlı:</strong> Hash hesaplama işlemi çok hızlıdır</li>
+                        <li><strong>Tek Yönlü:</strong> Hash'ten orijinal veriye ulaşılamaz</li>
+                        <li><strong>Çığ Etkisi:</strong> Girdideki küçük değişiklik hash'i tamamen değiştirir</li>
+                        <li><strong>Çakışma Direnci:</strong> İki farklı girdinin aynı hash'i üretmesi çok zordur</li>
+                    </ul>
+                </div>
+                <div class="bg-red-900/20 border border-red-700 rounded-lg p-4">
+                    <p class="text-red-300">
+                        <strong>⚠️ Önemli:</strong> MD5 ve SHA-1 artık güvenli kabul edilmez! 
+                        Modern uygulamalarda SHA-256 veya daha güçlü algoritmalar kullanılmalıdır.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hash Calculator -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 mb-8 border border-gray-700">
+            <h3 class="text-2xl font-bold text-white mb-6">Hash Hesaplayıcı</h3>
+            
+            <div class="mb-6">
+                <label class="block text-lg font-semibold text-gray-200 mb-2">Metin Girin</label>
+                <textarea id="inputText" rows="4" placeholder="Hash değerini görmek istediğiniz metni buraya yazın..."
+                    class="w-full p-4 bg-gray-900 border-2 border-gray-700 rounded-lg focus:outline-none focus:border-red-500 transition resize-none"></textarea>
+            </div>
+
+            <div class="grid gap-4">
+                <!-- MD5 -->
+                <div class="bg-gray-900 rounded-lg p-4 border-l-4 border-orange-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-orange-400">MD5</h4>
+                        <span class="text-xs bg-red-900 text-red-300 px-2 py-1 rounded">GÜVENSIZ</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <code id="md5Output" class="flex-1 text-sm font-mono text-gray-400 break-all">-</code>
+                        <button onclick="copyHash('md5Output')" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-xs">
+                            Kopyala
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">128 bit (32 karakter hex)</div>
+                </div>
+
+                <!-- SHA-1 -->
+                <div class="bg-gray-900 rounded-lg p-4 border-l-4 border-yellow-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-yellow-400">SHA-1</h4>
+                        <span class="text-xs bg-red-900 text-red-300 px-2 py-1 rounded">GÜVENSIZ</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <code id="sha1Output" class="flex-1 text-sm font-mono text-gray-400 break-all">-</code>
+                        <button onclick="copyHash('sha1Output')" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-xs">
+                            Kopyala
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">160 bit (40 karakter hex)</div>
+                </div>
+
+                <!-- SHA-256 -->
+                <div class="bg-gray-900 rounded-lg p-4 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-green-400">SHA-256</h4>
+                        <span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded">GÜVENLİ</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <code id="sha256Output" class="flex-1 text-sm font-mono text-gray-400 break-all">-</code>
+                        <button onclick="copyHash('sha256Output')" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-xs">
+                            Kopyala
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">256 bit (64 karakter hex)</div>
+                </div>
+
+                <!-- SHA-512 -->
+                <div class="bg-gray-900 rounded-lg p-4 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-blue-400">SHA-512</h4>
+                        <span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded">ÇOK GÜVENLİ</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <code id="sha512Output" class="flex-1 text-sm font-mono text-gray-400 break-all">-</code>
+                        <button onclick="copyHash('sha512Output')" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-xs">
+                            Kopyala
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">512 bit (128 karakter hex)</div>
+                </div>
+
+                <!-- SHA-3 -->
+                <div class="bg-gray-900 rounded-lg p-4 border-l-4 border-purple-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-purple-400">SHA-3 (SHA3-256)</h4>
+                        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">YENİ STANDART</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <code id="sha3Output" class="flex-1 text-sm font-mono text-gray-400 break-all">-</code>
+                        <button onclick="copyHash('sha3Output')" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-xs">
+                            Kopyala
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">256 bit - Sünger yapısı kullanan en yeni standart</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Demo -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 mb-8 border border-gray-700">
+            <h3 class="text-2xl font-bold text-white mb-4">🧪 Çığ Etkisi Demosu</h3>
+            <p class="text-gray-300 mb-4">
+                Hash fonksiyonlarının önemli bir özelliği <strong>"çığ etkisi"</strong>dir. 
+                Girdide yapılan en küçük değişiklik bile hash değerini tamamen değiştirir.
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-4">
+                <div>
+                    <label class="block font-semibold text-gray-200 mb-2">Metin 1</label>
+                    <input type="text" id="compare1" value="Merhaba" 
+                        class="w-full p-3 bg-gray-900 border-2 border-gray-700 rounded-lg focus:outline-none focus:border-red-500">
+                    <div class="mt-2 p-3 bg-gray-900 rounded border border-green-700">
+                        <div class="text-xs text-gray-400 mb-1">SHA-256:</div>
+                        <code id="hash1" class="text-xs font-mono text-green-400 break-all"></code>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-gray-200 mb-2">Metin 2</label>
+                    <input type="text" id="compare2" value="Merhaba!" 
+                        class="w-full p-3 bg-gray-900 border-2 border-gray-700 rounded-lg focus:outline-none focus:border-red-500">
+                    <div class="mt-2 p-3 bg-gray-900 rounded border border-blue-700">
+                        <div class="text-xs text-gray-400 mb-1">SHA-256:</div>
+                        <code id="hash2" class="text-xs font-mono text-blue-400 break-all"></code>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-300">Farklı Karakter Sayısı:</span>
+                    <span id="diffCount" class="text-2xl font-bold text-red-400">0</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 border border-gray-700">
+            <h3 class="text-2xl font-bold text-white mb-4">💼 Kullanım Alanları</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <h4 class="font-bold text-red-400 mb-2">✅ Parola Saklama</h4>
+                    <p class="text-sm text-gray-400">Parolaların hash'leri saklanır, orijinal parola asla depolanmaz.</p>
+                </div>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <h4 class="font-bold text-red-400 mb-2">📄 Dosya Bütünlüğü</h4>
+                    <p class="text-sm text-gray-400">Dosyanın değiştirilmediğini doğrulamak için checksum olarak kullanılır.</p>
+                </div>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <h4 class="font-bold text-red-400 mb-2">🔗 Blockchain</h4>
+                    <p class="text-sm text-gray-400">Blokların zincirlendiği ve değişmezliğin sağlandığı yapı.</p>
+                </div>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <h4 class="font-bold text-red-400 mb-2">🔑 Dijital İmza</h4>
+                    <p class="text-sm text-gray-400">Mesajın özeti alınarak imzalanır, böylece değişiklik tespit edilir.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const compare1 = document.getElementById('compare1');
+        const compare2 = document.getElementById('compare2');
+
+        function updateHashes() {
+            const text = inputText.value;
+            
+            if (!text) {
+                document.getElementById('md5Output').textContent = '-';
+                document.getElementById('sha1Output').textContent = '-';
+                document.getElementById('sha256Output').textContent = '-';
+                document.getElementById('sha512Output').textContent = '-';
+                document.getElementById('sha3Output').textContent = '-';
+                return;
+            }
+
+            document.getElementById('md5Output').textContent = CryptoJS.MD5(text).toString();
+            document.getElementById('sha1Output').textContent = CryptoJS.SHA1(text).toString();
+            document.getElementById('sha256Output').textContent = CryptoJS.SHA256(text).toString();
+            document.getElementById('sha512Output').textContent = CryptoJS.SHA512(text).toString();
+            document.getElementById('sha3Output').textContent = CryptoJS.SHA3(text, { outputLength: 256 }).toString();
+        }
+
+        function updateComparison() {
+            const text1 = compare1.value;
+            const text2 = compare2.value;
+            
+            const hash1 = CryptoJS.SHA256(text1).toString();
+            const hash2 = CryptoJS.SHA256(text2).toString();
+            
+            document.getElementById('hash1').textContent = hash1;
+            document.getElementById('hash2').textContent = hash2;
+
+            // Count different characters
+            let diff = 0;
+            for (let i = 0; i < hash1.length; i++) {
+                if (hash1[i] !== hash2[i]) diff++;
+            }
+            document.getElementById('diffCount').textContent = diff + ' / ' + hash1.length;
+        }
+
+        function copyHash(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Hash kopyalandı!');
+            });
+        }
+
+        inputText.addEventListener('input', updateHashes);
+        compare1.addEventListener('input', updateComparison);
+        compare2.addEventListener('input', updateComparison);
+
+        // Initialize
+        updateComparison();
+    </script>
+
+</body>
+</html>

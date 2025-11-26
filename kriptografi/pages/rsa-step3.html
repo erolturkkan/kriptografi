@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSA Adım 3: Şifre Çözme - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800/80 backdrop-blur-xl border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-purple-400 hover:text-purple-300 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold hidden md:inline">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm text-gray-400">Adım 3 / 3</span>
+                <span class="text-sm text-green-400 font-semibold">100% ✓</span>
+            </div>
+            <div class="w-full bg-gray-700 rounded-full h-2">
+                <div class="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between mb-6">
+            <a href="rsa-step2.html" class="flex items-center space-x-2 text-gray-400 hover:text-purple-400 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                <span>Adım 2</span>
+            </a>
+            <a href="rsa-step1.html" class="flex items-center space-x-2 text-gray-400 hover:text-purple-400 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <span>Baştan Başla</span>
+            </a>
+        </div>
+
+        <!-- Main Title -->
+        <div class="text-center mb-8">
+            <div class="inline-block bg-red-500/20 rounded-full px-4 py-2 mb-4">
+                <span class="text-red-300 font-semibold">🔓 Adım 3</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Şifre Çözme</h1>
+            <p class="text-xl text-gray-400">Private Key ile Mesajı Çözme</p>
+        </div>
+
+        <!-- Key Info Panel -->
+        <div id="key-info" class="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-2xl p-6 md:p-8 mb-8">
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                Private Key (Özel Anahtar - GİZLİ!)
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-gray-800/50 rounded-lg p-4">
+                    <p class="text-gray-400 text-sm mb-1">Modül N</p>
+                    <p class="text-2xl font-bold text-red-400"><span id="N-value">-</span></p>
+                </div>
+                <div class="bg-gray-800/50 rounded-lg p-4">
+                    <p class="text-gray-400 text-sm mb-1">Gizli Üs D</p>
+                    <p class="text-2xl font-bold text-red-400"><span id="D-value">-</span></p>
+                </div>
+            </div>
+            <div class="mt-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4">
+                <p class="text-yellow-200 text-sm">
+                    ⚠️ Eğer anahtarları göremiyor iseniz <a href="rsa-step1.html" class="underline font-semibold text-yellow-300">Adım 1'e</a> dönüp anahtar üretmeniz gerekmektedir.
+                </p>
+            </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="bg-gradient-to-r from-red-900/30 to-pink-900/30 border border-red-500/30 rounded-2xl p-6 md:p-8 mb-8">
+            <h3 class="text-xl font-bold text-white mb-3 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Açıklama
+            </h3>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                Şifrelenmiş mesajı yapıştırın. RSA algoritması <strong class="text-red-400">Private Key (D, N)</strong> kullanarak orijinal mesajı geri çözecektir.
+            </p>
+            <div class="bg-red-900/20 rounded-lg p-4">
+                <p class="text-red-200 text-sm font-mono">
+                    <strong>Formül:</strong> Orijinal = C<sup>D</sup> mod N
+                </p>
+            </div>
+        </div>
+
+        <!-- Auto-loaded encrypted message -->
+        <div id="auto-encrypted" class="hidden bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-500/30 rounded-2xl p-6 md:p-8 mb-8">
+            <h3 class="text-lg font-bold text-green-400 mb-3 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Önceki Adımdan Yüklenen Şifreli Mesaj
+            </h3>
+            <div class="bg-gray-800/50 rounded-lg p-4 max-h-40 overflow-y-auto">
+                <p id="auto-encrypted-text" class="text-purple-400 font-mono text-sm break-all"></p>
+            </div>
+            <button onclick="useAutoEncrypted()" class="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition text-sm">
+                📥 Bu Mesajı Kullan
+            </button>
+        </div>
+
+        <!-- Decryption Form -->
+        <div class="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-2xl p-6 md:p-8 mb-8">
+            <div class="space-y-6">
+                <div>
+                    <label for="encrypted-input" class="block text-sm font-semibold text-gray-300 mb-2">
+                        Şifrelenmiş Mesaj (Sayısal Format):
+                    </label>
+                    <textarea 
+                        id="encrypted-input" 
+                        rows="4"
+                        placeholder="Şifrelenmiş mesajı buraya yapıştırın (örn: 123-456-789-...)..."
+                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none font-mono text-sm"
+                    ></textarea>
+                </div>
+                <button 
+                    onclick="decryptMessage()" 
+                    class="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold py-4 px-6 rounded-lg transition shadow-lg">
+                    🔓 Mesajı Çöz
+                </button>
+            </div>
+        </div>
+
+        <!-- Output Panel -->
+        <div id="decryption-output" class="hidden bg-gradient-to-br from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-2xl p-6 md:p-8 mb-8">
+            <h3 class="text-2xl font-bold text-green-400 mb-6 flex items-center">
+                <svg class="w-7 h-7 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Çözülmüş Mesaj
+            </h3>
+            
+            <div class="bg-gray-800/50 rounded-lg p-6 mb-6">
+                <p class="text-gray-400 text-sm mb-2">Orijinal Mesaj:</p>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <p id="decrypted-text" class="text-green-400 font-semibold text-lg break-all"></p>
+                </div>
+            </div>
+
+            <!-- Comparison if original available -->
+            <div id="comparison-panel" class="hidden bg-gradient-to-r from-cyan-900/20 to-blue-900/20 border border-cyan-500/30 rounded-xl p-6 mb-6">
+                <h4 class="text-lg font-bold text-cyan-400 mb-4">🔍 Karşılaştırma:</h4>
+                <div class="space-y-3">
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <p class="text-gray-400 text-sm mb-1">Orijinal Mesaj (Adım 2'den):</p>
+                        <p id="original-message" class="text-white font-semibold"></p>
+                    </div>
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <p class="text-gray-400 text-sm mb-1">Çözülmüş Mesaj:</p>
+                        <p id="decrypted-message" class="text-white font-semibold"></p>
+                    </div>
+                    <div id="match-result" class="bg-green-900/30 border border-green-500/50 rounded-lg p-4 text-center">
+                        <p class="text-green-400 font-bold text-lg">✅ Mesajlar eşleşiyor! RSA başarılı!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decryption Steps -->
+            <div class="bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-500/30 rounded-xl p-6 mb-6">
+                <h4 class="text-lg font-bold text-purple-400 mb-4">📊 Şifre Çözme Adımları:</h4>
+                <div id="decryption-steps" class="space-y-2 text-gray-300 font-mono text-sm max-h-96 overflow-y-auto"></div>
+            </div>
+
+            <!-- Success Message -->
+            <div class="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-500/50 rounded-2xl p-8 text-center">
+                <div class="text-6xl mb-4">🎉</div>
+                <h4 class="text-2xl font-bold text-green-400 mb-3">RSA Öğrenimi Tamamlandı!</h4>
+                <p class="text-gray-300 mb-6">
+                    Tebrikler! RSA şifreleme algoritmasının tüm adımlarını başarıyla tamamladınız.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="rsa-step1.html" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition">
+                        🔄 Baştan Başla
+                    </a>
+                    <a href="rsa.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition">
+                        🚀 Hızlı RSA Aracı
+                    </a>
+                    <a href="../index.html" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition">
+                        🏠 Ana Sayfa
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Load keys and encrypted message from session storage
+        window.onload = function() {
+            const N = sessionStorage.getItem('rsa_N');
+            const D = sessionStorage.getItem('rsa_D');
+            const encrypted = sessionStorage.getItem('rsa_encrypted');
+            const original = sessionStorage.getItem('rsa_original');
+            
+            if (N && D) {
+                document.getElementById('N-value').textContent = N;
+                document.getElementById('D-value').textContent = D;
+            }
+
+            if (encrypted) {
+                document.getElementById('auto-encrypted-text').textContent = encrypted;
+                document.getElementById('auto-encrypted').classList.remove('hidden');
+            }
+
+            if (original) {
+                window.originalMessage = original;
+            }
+        };
+
+        function useAutoEncrypted() {
+            const encrypted = sessionStorage.getItem('rsa_encrypted');
+            document.getElementById('encrypted-input').value = encrypted;
+            document.getElementById('encrypted-input').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function modPow(base, exp, mod) {
+            let result = 1;
+            base = base % mod;
+            while (exp > 0) {
+                if (exp % 2 === 1) {
+                    result = (result * base) % mod;
+                }
+                exp = Math.floor(exp / 2);
+                base = (base * base) % mod;
+            }
+            return result;
+        }
+
+        function decryptMessage() {
+            const encryptedInput = document.getElementById('encrypted-input').value.trim();
+            const N = parseInt(sessionStorage.getItem('rsa_N'));
+            const D = parseInt(sessionStorage.getItem('rsa_D'));
+
+            console.log('Debug - Encrypted Input:', encryptedInput);
+            console.log('Debug - N:', N, 'D:', D);
+
+            if (!N || !D) {
+                alert('❌ Anahtarlar bulunamadı! Lütfen Adım 1\'e dönüp anahtar üretin.');
+                return;
+            }
+
+            if (!encryptedInput) {
+                alert('❌ Lütfen şifrelenmiş mesajı yapıştırınız!');
+                return;
+            }
+
+            try {
+                const encryptedNumbers = encryptedInput.split('-').map(num => parseInt(num.trim()));
+                console.log('Debug - Encrypted Numbers:', encryptedNumbers);
+                
+                const decrypted = [];
+                const steps = [];
+
+                for (let i = 0; i < encryptedNumbers.length; i++) {
+                    const encNum = encryptedNumbers[i];
+                    const decryptedChar = modPow(encNum, D, N);
+                    const char = String.fromCharCode(decryptedChar);
+                    
+                    console.log(`Debug - Char ${i}: ${encNum}^${D} mod ${N} = ${decryptedChar} = '${char}'`);
+                    
+                    decrypted.push(char);
+
+                    if (i < 10) { // Show first 10 steps
+                        steps.push(`${encNum}<sup>${D}</sup> mod ${N} = ${decryptedChar} → '${char}'`);
+                    }
+                }
+
+                if (encryptedNumbers.length > 10) {
+                    steps.push(`... ve ${encryptedNumbers.length - 10} karakter daha`);
+                }
+
+                const decryptedMessage = decrypted.join('');
+                console.log('Debug - Decrypted Message:', decryptedMessage);
+                document.getElementById('decrypted-text').textContent = decryptedMessage;
+
+                // Display steps
+                const stepsDiv = document.getElementById('decryption-steps');
+                stepsDiv.innerHTML = steps.map((step, i) => 
+                    `<p><span class="text-purple-400 font-bold">Karakter ${i + 1}:</span> ${step}</p>`
+                ).join('');
+
+                // Show comparison if original exists
+                if (window.originalMessage) {
+                    document.getElementById('original-message').textContent = window.originalMessage;
+                    document.getElementById('decrypted-message').textContent = decryptedMessage;
+                    
+                    const matchResult = document.getElementById('match-result');
+                    if (window.originalMessage === decryptedMessage) {
+                        matchResult.className = 'bg-green-900/30 border border-green-500/50 rounded-lg p-4 text-center';
+                        matchResult.innerHTML = '<p class="text-green-400 font-bold text-lg">✅ Mesajlar eşleşiyor! RSA başarılı!</p>';
+                    } else {
+                        matchResult.className = 'bg-red-900/30 border border-red-500/50 rounded-lg p-4 text-center';
+                        matchResult.innerHTML = '<p class="text-red-400 font-bold text-lg">❌ Mesajlar eşleşmiyor. Kontrol edin!</p>';
+                    }
+                    
+                    document.getElementById('comparison-panel').classList.remove('hidden');
+                }
+
+                // Show output
+                document.getElementById('decryption-output').classList.remove('hidden');
+                document.getElementById('decryption-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (error) {
+                alert('❌ Şifre çözme hatası! Lütfen geçerli bir şifrelenmiş mesaj giriniz.');
+                console.error(error);
+            }
+        }
+    </script>
+
+</body>
+</html>

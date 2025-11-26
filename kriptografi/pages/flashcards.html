@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kriptografi Bilgi Kartları - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .card-3d.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-indigo-400 hover:text-indigo-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                    
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+
+        <!-- Mode Selection -->
+        <div class="flex justify-center mb-8">
+            <div class="bg-gray-800 rounded-lg p-1 inline-flex border border-gray-700">
+                <button id="studyMode" class="px-6 py-2 rounded-md font-semibold transition bg-indigo-500 text-white">
+                    📚 Çalış
+                </button>
+                <button id="testMode" class="px-6 py-2 rounded-md font-semibold transition text-gray-400">
+                    ✅ Test
+                </button>
+            </div>
+        </div>
+
+        <!-- Study Mode -->
+        <div id="studySection">
+            <!-- Progress & Knowledge Stats -->
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-400">İlerleme</span>
+                        <span class="text-sm text-indigo-400 font-semibold">
+                            <span id="currentCard">1</span> / <span id="totalCards">35</span>
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div id="progressBar" class="bg-indigo-500 h-2 rounded-full transition-all" style="width: 2.86%"></div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-400">Öğrenilen Terimler</span>
+                        <span class="text-sm text-green-400 font-semibold" id="knownCount">0 / 35</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div id="knowledgeBar" class="bg-green-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flashcard -->
+            <div class="perspective-1000 mb-6">
+                <div id="flashcard" class="card-3d relative h-96 cursor-pointer">
+                    <!-- Front -->
+                    <div class="card-face card-front bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-8 flex flex-col items-center justify-center shadow-2xl border-4 border-indigo-400">
+                        <div class="text-sm text-indigo-200 mb-4">TERIM</div>
+                        <h2 id="cardTerm" class="text-4xl md:text-5xl font-bold text-white text-center mb-4">Algorithm</h2>
+                        <div class="text-sm text-indigo-200 mt-8">Açıklamayı görmek için tıklayın</div>
+                    </div>
+                    <!-- Back -->
+                    <div class="card-face card-back bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-8 flex flex-col items-center justify-center shadow-2xl border-4 border-purple-400">
+                        <div class="text-sm text-purple-200 mb-4">AÇIKLAMA</div>
+                        <p id="cardDefinition" class="text-lg text-white text-center mb-6">Belirli bir problemi çözmek veya hesaplama yapmak için tasarlanmış adım adım talimatlar dizisi.</p>
+                        <div class="bg-white/20 rounded-lg p-4 w-full">
+                            <p id="cardAnalogy" class="text-sm text-purple-100 text-center italic">"Yemek tarifindeki adımlar gibi - her adımı takip ederseniz sonuca ulaşırsınız."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex justify-center gap-4 mb-6">
+                <button id="prevCard" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-8 rounded-lg transition">
+                    ← Önceki
+                </button>
+                <button id="flipCard" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg transition">
+                    🔄 Çevir
+                </button>
+                <button id="nextCard" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-8 rounded-lg transition">
+                    Sonraki →
+                </button>
+            </div>
+
+            <!-- Knowledge Tracking -->
+            <div class="flex justify-center gap-4 mb-8">
+                <button id="dontKnow" class="bg-red-900 hover:bg-red-800 text-white px-8 py-3 rounded-lg transition text-sm font-semibold">
+                    ❌ Bilmiyorum
+                </button>
+                <button id="know" class="bg-green-900 hover:bg-green-800 text-white px-8 py-3 rounded-lg transition text-sm font-semibold">
+                    ✅ Biliyorum
+                </button>
+            </div>
+
+            <!-- Reset Progress -->
+            <div class="text-center">
+                <button id="resetProgress" class="text-gray-400 hover:text-gray-300 text-sm underline">
+                    İlerlemeyi Sıfırla
+                </button>
+            </div>
+        </div>
+
+        <!-- Test Mode -->
+        <div id="testSection" class="hidden">
+            <div class="bg-gray-800 rounded-xl p-6 md:p-8 border border-gray-700 mb-6">
+                <!-- Question Counter -->
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-gray-400">Soru <span id="questionNum">1</span>/15</span>
+                    <span class="text-indigo-400 font-semibold">Puan: <span id="score">0</span></span>
+                </div>
+
+                <!-- Question -->
+                <div class="mb-6">
+                    <h3 class="text-2xl font-bold text-white mb-4" id="question">SHA-256 hangi hash algoritması ailesine aittir?</h3>
+                </div>
+
+                <!-- Options -->
+                <div class="space-y-3" id="optionsContainer">
+                    <!-- Options will be dynamically inserted -->
+                </div>
+
+                <!-- Feedback -->
+                <div id="feedback" class="mt-6 p-4 rounded-lg hidden"></div>
+
+                <!-- Next Button -->
+                <button id="nextQuestion" class="mt-6 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg transition w-full hidden">
+                    Sonraki Soru
+                </button>
+            </div>
+
+            <!-- Results (hidden initially) -->
+            <div id="results" class="bg-gray-800 rounded-xl p-8 border border-gray-700 hidden text-center">
+                <h3 class="text-3xl font-bold text-white mb-4">🎉 Test Tamamlandı!</h3>
+                <div class="text-6xl font-bold text-indigo-400 mb-2" id="finalScore">0</div>
+                <div class="text-gray-400 mb-6">/ 15 Doğru</div>
+                <button id="restartTest" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg transition">
+                    Testi Tekrarla
+                </button>
+            </div>
+        </div>
+
+        <!-- Card List -->
+        <section class="mt-12">
+            <h3 class="text-2xl font-bold text-white mb-6">📋 Tüm Terimler (<span id="totalTerms">35</span>)</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="termsList">
+                <!-- Will be populated by JS -->
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const flashcards = [
+            { term: "Algorithm", definition: "Belirli bir problemi çözmek veya hesaplama yapmak için tasarlanmış adım adım talimatlar dizisi.", analogy: "Yemek tarifindeki adımlar gibi - her adımı takip ederseniz sonuca ulaşırsınız." },
+            { term: "Asymmetric Cryptographic Algorithm", definition: "İki farklı anahtar kullanan şifreleme yöntemi: açık anahtar (şifreleme) ve özel anahtar (deşifreleme).", analogy: "Posta kutusu: Herkes mektup atabilir (açık anahtar) ama sadece siz açabilirsiniz (özel anahtar)." },
+            { term: "Birthday Attack", definition: "Hash fonksiyonlarındaki çakışmaları bulmak için kullanılan kriptanaliz tekniği. Doğum günü paradoksuna dayanır.", analogy: "23 kişilik bir grupta iki kişinin aynı günde doğmuş olma ihtimalinin %50'den fazla olması gibi." },
+            { term: "Blockchain", definition: "Merkezi olmayan, dağıtık bir veri yapısı. Her blok önceki bloğun hash'ini içerir, böylece değişmezlik sağlanır.", analogy: "Her halkası bir öncekine bağlı olan zincir - bir halkayı değiştirirseniz tüm zincir bozulur." },
+            { term: "Collision", definition: "İki farklı girdinin aynı hash değerini üretmesi durumu. Güvenli hash fonksiyonlarında çok nadir olmalıdır.", analogy: "İki farklı kişinin aynı parmak izine sahip olması kadar nadir olmalı." },
+            { term: "Cryptography", definition: "Bilgiyi yetkisiz erişime karşı korumak için şifreleme ve güvenlik tekniklerinin bilimi.", analogy: "Mesajlarınızı gizli bir dile çevirerek sadece anahtarı olanların anlayabilmesini sağlamak." },
+            { term: "Database-level Encryption", definition: "Veritabanı seviyesinde tüm verilerin veya belirli sütunların şifrelenmesi.", analogy: "Kütüphanedeki tüm kitapları kilitli dolapta saklamak." },
+            { term: "Decryption", definition: "Şifreli metni düz metne geri dönüştürme işlemi. Doğru anahtarla yapılır.", analogy: "Şifrelenmiş mesajı tekrar ana dilinize çevirmek." },
+            { term: "Digital Signature", definition: "Dijital bir belgenin doğruluğunu ve kaynağını garanti eden kriptografik imza.", analogy: "Elle atılan imza gibi - ama taklit edilemez ve değişiklik tespit edilebilir." },
+            { term: "Downgrade Attack", definition: "Sistemi daha zayıf güvenlik protokolü kullanmaya zorlayarak güvenliği zayıflatma saldırısı.", analogy: "Çelik kapıyı kıramayan hırsızın, evi tahta kapı kullanmaya zorlaması gibi." },
+            { term: "Encryption", definition: "Düz metni şifreli metne dönüştürme işlemi. Yetkisiz erişimi engeller.", analogy: "Mesajınızı yabancı bir dile çevirmek - anahtarı olmayanlar anlayamaz." },
+            { term: "File-level Encryption", definition: "Dosya bazında şifreleme. Her dosya ayrı ayrı şifrelenir.", analogy: "Evdeki her değerli eşyayı ayrı ayrı kasaya koymak." },
+            { term: "Full-disk Encryption (FDE)", definition: "Diskin tamamını şifreleyerek tüm verileri koruma altına alma.", analogy: "Evin tamamını dev bir kasaya koymak - içindeki her şey korunur." },
+            { term: "Hardware Security Module (HSM)", definition: "Kriptografik anahtarları güvenli şekilde saklayan ve işlemleri gerçekleştiren özel donanım cihazı.", analogy: "Banka kasası - anahtarlarınız fiziksel olarak korunan özel bir yerde saklanır." },
+            { term: "Hashing", definition: "Herhangi bir boyuttaki veriyi sabit uzunlukta bir değere (hash) dönüştürme işlemi. Tek yönlüdür.", analogy: "Parmak izi gibi: Her verinin benzersiz bir özeti vardır ve geriye dönüştürülemez." },
+            { term: "Key Exchange", definition: "İki tarafın güvenli olmayan bir kanal üzerinden şifreleme anahtarı paylaşması işlemi.", analogy: "Kalabalık bir ortamda sadece iki kişinin anlayabileceği şekilde şifre paylaşmak." },
+            { term: "Key Length", definition: "Şifreleme anahtarının bit cinsinden uzunluğu. Uzun anahtarlar daha güvenlidir.", analogy: "Daha uzun şifre = daha güvenli kilit. 256 bitlik anahtar, 128 bitlik'ten çok daha güvenlidir." },
+            { term: "Nonrepudiation", definition: "Bir işlemin yapıldığının inkar edilemez şekilde kanıtlanması. Dijital imzalar bu özelliği sağlar.", analogy: "Noter onaylı imza - sonradan 'ben atmadım' diyemezsiniz." },
+            { term: "Open Public Ledger", definition: "Herkesin görebileceği, şeffaf işlem kayıt defteri. Blockchain teknolojisinde kullanılır.", analogy: "Herkesin okuyabildiği ama kimsenin tek başına değiştiremediği dev defter." },
+            { term: "Partition-level Encryption", definition: "Disk bölümü (partition) seviyesinde şifreleme. Sadece belirli bölümler şifrelenir.", analogy: "Evdeki sadece belirli odaları kilitlemek." },
+            { term: "Record-level Encryption", definition: "Veritabanında kayıt (satır) seviyesinde şifreleme.", analogy: "Defterdeki her satırı ayrı ayrı şifrelemek." },
+            { term: "Secure Enclave", definition: "İşlemci içinde izole edilmiş, güvenli hesaplama ortamı. Hassas verileri korur.", analogy: "Bankanın içindeki özel zırhlı oda - ana binadan ayrı, ekstra korumalı." },
+            { term: "Steganography", definition: "Bilginin başka bir medya içine gizlenmesi tekniği. Örneğin bir görüntünün piksellerine mesaj gömme.", analogy: "Görünmez mürekkeple yazı yazmak gibi - mesaj orada ama görünmüyor." },
+            { term: "Symmetric Cryptographic Algorithm", definition: "Aynı anahtarın hem şifreleme hem de deşifreleme için kullanıldığı yöntem.", analogy: "Bir kilidi hem kilitlemek hem de açmak için aynı anahtarı kullanmak." },
+            { term: "Trusted Platform Module (TPM)", definition: "Bilgisayarlara entegre edilen, kriptografik işlemler için özel güvenlik çipi.", analogy: "Bilgisayarınızın içindeki mini kasa - anahtarları güvenle saklar." },
+            { term: "Volume-level Encryption", definition: "Tam bir disk hacminin (volume) şifrelenmesi. Mantıksal sürücü seviyesinde koruma.", analogy: "Harici hard diskin tamamını şifrelemek - fişini çektiniz mi tüm veri korunur." },
+            { term: "AES", definition: "Advanced Encryption Standard - Modern simetrik şifreleme standardı. 128, 192, 256 bit anahtar uzunluğu kullanır.", analogy: "Aynı anahtar hem kilitleme hem de kilit açma için kullanılır - evinizdeki kapı anahtarı gibi." },
+            { term: "RSA", definition: "Rivest-Shamir-Adleman - Asimetrik şifreleme algoritması. Açık ve özel anahtar çifti kullanır.", analogy: "Posta kutunuz gibi: Herkes mektup atabilir (açık anahtar) ama sadece siz açabilirsiniz (özel anahtar)." },
+            { term: "SHA-256", definition: "Secure Hash Algorithm 256-bit - Kriptografik hash fonksiyonu. 256 bit uzunluğunda hash üretir.", analogy: "Parmak izi gibi: Her verinin benzersiz bir özeti vardır ve geriye dönüştürülemez." },
+            { term: "CIA Üçlüsü", definition: "Confidentiality (Gizlilik), Integrity (Bütünlük), Availability (Erişilebilirlik) - Bilgi güvenliğinin 3 temel prensibi.", analogy: "Bir kasadaki para: Sadece yetkililerin görmesi (C), değiştirilmemesi (I) ve ihtiyaç duyulduğunda erişilebilir olması (A)." },
+            { term: "MD5", definition: "Message Digest 5 - 128 bit hash üreten algoritma. Artık güvenli kabul edilmez.", analogy: "Eski model kilit - bir zamanlar güvenliydi ama artık kolayca kırılabiliyor." },
+            { term: "Sezar Şifresi", definition: "Alfabedeki her harfin belirli sayıda kaydırıldığı klasik şifreleme yöntemi.", analogy: "Alfabe çarkını döndürmek gibi - A yerine D, B yerine E yazarsınız." },
+            { term: "Public Key", definition: "Asimetrik şifrelemede herkesle paylaşılabilen açık anahtar. Şifreleme için kullanılır.", analogy: "Herkese açık adresiniz - herkes size mektup gönderebilir." },
+            { term: "Private Key", definition: "Asimetrik şifrelemede gizli tutulan özel anahtar. Deşifreleme için kullanılır.", analogy: "Sadece sizin bildiğiniz posta kutusu anahtarı - sadece siz mektupları okuyabilirsiniz." },
+            { term: "Hash Collision", definition: "İki farklı girdinin aynı hash değerini üretmesi durumu. Güvenli hash fonksiyonlarında çok nadir olmalıdır.", analogy: "İki farklı kişinin aynı parmak izine sahip olması kadar nadir olmalı." }
+        ];
+
+        const quizQuestions = [
+            { question: "SHA-256 hangi hash algoritması ailesine aittir?", options: ["MD5 ailesi", "SHA-2 ailesi", "SHA-1 ailesi", "AES ailesi"], correct: 1 },
+            { question: "Asimetrik şifrelemede kaç anahtar kullanılır?", options: ["1", "2", "3", "4"], correct: 1 },
+            { question: "Hangi algoritma artık güvenli kabul edilmez?", options: ["AES", "SHA-256", "MD5", "RSA"], correct: 2 },
+            { question: "Sezar şifresi hangi şifreleme türüne örnektir?", options: ["Asimetrik", "Simetrik", "Hash", "Steganografi"], correct: 1 },
+            { question: "Bilgi güvenliğinin 3 temel prensibi hangisidir?", options: ["ABC", "CIA", "FBI", "NSA"], correct: 1 },
+            { question: "Hash fonksiyonlarının en önemli özelliği nedir?", options: ["Çift yönlü", "Tek yönlü", "Yavaş", "Hızlı ve çift yönlü"], correct: 1 },
+            { question: "AES hangi bit uzunluklarında anahtar kullanır?", options: ["64, 128, 256", "128, 192, 256", "256, 512, 1024", "128, 256, 512"], correct: 1 },
+            { question: "Steganografi nedir?", options: ["Şifreleme yöntemi", "Hash algoritması", "Bilgi gizleme tekniği", "Parola yönetimi"], correct: 2 },
+            { question: "Public key (açık anahtar) ne için kullanılır?", options: ["Deşifreleme", "Şifreleme", "Hash hesaplama", "Veri silme"], correct: 1 },
+            { question: "İki farklı girdinin aynı hash üretmesine ne denir?", options: ["Hash match", "Hash collision", "Hash duplicate", "Hash error"], correct: 1 },
+            { question: "TPM nedir?", options: ["Yazılım şifreleme", "Güvenlik çipi", "Hash algoritması", "Ağ protokolü"], correct: 1 },
+            { question: "Blockchain'de bloklar nasıl bağlanır?", options: ["Rastgele", "Hash zincirleme", "Tarih sırasına göre", "Boyuta göre"], correct: 1 },
+            { question: "Full-disk encryption ne korur?", options: ["Sadece dosyalar", "Sadece sistem", "Tüm disk", "Sadece klasörler"], correct: 2 },
+            { question: "Dijital imza hangi özelliği sağlar?", options: ["Hız", "Nonrepudiation", "Sıkıştırma", "Hızlandırma"], correct: 1 },
+            { question: "Downgrade attack ne yapar?", options: ["Güvenliği artırır", "Güvenliği zayıflatır", "Hash hesaplar", "Şifreler"], correct: 1 }
+        ];
+
+        let currentCardIndex = 0;
+        let knownCards = new Set();
+        let currentQuestionIndex = 0;
+        let testScore = 0;
+
+        // localStorage functions
+        function loadProgress() {
+            const saved = localStorage.getItem('cryptoFlashcardsProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                knownCards = new Set(data.knownCards || []);
+                currentCardIndex = data.lastCard || 0;
+                updateKnownCount();
+            }
+        }
+
+        function saveProgress() {
+            const data = {
+                knownCards: Array.from(knownCards),
+                lastCard: currentCardIndex,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('cryptoFlashcardsProgress', JSON.stringify(data));
+            updateKnownCount();
+        }
+
+        function updateKnownCount() {
+            const count = knownCards.size;
+            const total = flashcards.length;
+            document.getElementById('knownCount').textContent = `${count} / ${total}`;
+            const percentage = (count / total) * 100;
+            document.getElementById('knowledgeBar').style.width = percentage + '%';
+        }
+
+        // Study Mode Functions
+        function updateCard() {
+            const card = flashcards[currentCardIndex];
+            document.getElementById('cardTerm').textContent = card.term;
+            document.getElementById('cardDefinition').textContent = card.definition;
+            document.getElementById('cardAnalogy').textContent = `"${card.analogy}"`;
+            document.getElementById('currentCard').textContent = currentCardIndex + 1;
+            document.getElementById('totalCards').textContent = flashcards.length;
+            document.getElementById('progressBar').style.width = ((currentCardIndex + 1) / flashcards.length * 100) + '%';
+            
+            updateCardKnownStatus();
+            document.getElementById('flashcard').classList.remove('flipped');
+            saveProgress();
+        }
+
+        function updateCardKnownStatus() {
+            const knowBtn = document.getElementById('know');
+            const dontKnowBtn = document.getElementById('dontKnow');
+            
+            if (knownCards.has(currentCardIndex)) {
+                knowBtn.classList.add('ring-2', 'ring-green-400');
+                dontKnowBtn.classList.remove('ring-2', 'ring-red-400');
+            } else {
+                knowBtn.classList.remove('ring-2', 'ring-green-400');
+                dontKnowBtn.classList.add('ring-2', 'ring-red-400');
+            }
+        }
+
+        document.getElementById('flipCard').addEventListener('click', () => {
+            document.getElementById('flashcard').classList.toggle('flipped');
+        });
+
+        document.getElementById('flashcard').addEventListener('click', () => {
+            document.getElementById('flashcard').classList.toggle('flipped');
+        });
+
+        document.getElementById('nextCard').addEventListener('click', () => {
+            currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+            updateCard();
+        });
+
+        document.getElementById('prevCard').addEventListener('click', () => {
+            currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+            updateCard();
+        });
+
+        document.getElementById('know').addEventListener('click', () => {
+            knownCards.add(currentCardIndex);
+            updateCard();
+            document.getElementById('nextCard').click();
+        });
+
+        document.getElementById('dontKnow').addEventListener('click', () => {
+            knownCards.delete(currentCardIndex);
+            updateCard();
+            document.getElementById('nextCard').click();
+        });
+
+        document.getElementById('resetProgress').addEventListener('click', () => {
+            if (confirm('Tüm ilerleme silinecek. Emin misiniz?')) {
+                localStorage.removeItem('cryptoFlashcardsProgress');
+                knownCards = new Set();
+                currentCardIndex = 0;
+                updateCard();
+                updateKnownCount();
+            }
+        });
+
+        // Mode Switching
+        document.getElementById('studyMode').addEventListener('click', () => {
+            document.getElementById('studyMode').classList.add('bg-indigo-500', 'text-white');
+            document.getElementById('studyMode').classList.remove('text-gray-400');
+            document.getElementById('testMode').classList.remove('bg-indigo-500', 'text-white');
+            document.getElementById('testMode').classList.add('text-gray-400');
+            document.getElementById('studySection').classList.remove('hidden');
+            document.getElementById('testSection').classList.add('hidden');
+        });
+
+        document.getElementById('testMode').addEventListener('click', () => {
+            document.getElementById('testMode').classList.add('bg-indigo-500', 'text-white');
+            document.getElementById('testMode').classList.remove('text-gray-400');
+            document.getElementById('studyMode').classList.remove('bg-indigo-500', 'text-white');
+            document.getElementById('studyMode').classList.add('text-gray-400');
+            document.getElementById('testSection').classList.remove('hidden');
+            document.getElementById('studySection').classList.add('hidden');
+            startTest();
+        });
+
+        // Test Mode
+        function startTest() {
+            currentQuestionIndex = 0;
+            testScore = 0;
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('optionsContainer').parentElement.classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= quizQuestions.length) {
+                showResults();
+                return;
+            }
+
+            const q = quizQuestions[currentQuestionIndex];
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('question').textContent = q.question;
+            document.getElementById('score').textContent = testScore;
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('nextQuestion').classList.add('hidden');
+
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 bg-gray-900 hover:bg-gray-700 rounded-lg transition border-2 border-gray-700';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected) {
+            const q = quizQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            const feedback = document.getElementById('feedback');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('border-green-500', 'bg-green-900');
+                } else if (i === selected) {
+                    btn.classList.add('border-red-500', 'bg-red-900');
+                }
+            });
+
+            if (selected === q.correct) {
+                testScore++;
+                feedback.className = 'mt-6 p-4 rounded-lg bg-green-900 border border-green-500 text-green-200';
+                feedback.textContent = '✅ Doğru!';
+            } else {
+                feedback.className = 'mt-6 p-4 rounded-lg bg-red-900 border border-red-500 text-red-200';
+                feedback.textContent = '❌ Yanlış! Doğru cevap: ' + q.options[q.correct];
+            }
+            
+            feedback.classList.remove('hidden');
+            document.getElementById('nextQuestion').classList.remove('hidden');
+            document.getElementById('score').textContent = testScore;
+        }
+
+        document.getElementById('nextQuestion').addEventListener('click', () => {
+            currentQuestionIndex++;
+            showQuestion();
+        });
+
+        function showResults() {
+            document.getElementById('optionsContainer').parentElement.classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('finalScore').textContent = testScore;
+        }
+
+        document.getElementById('restartTest').addEventListener('click', startTest);
+
+        // Populate terms list
+        const termsList = document.getElementById('termsList');
+        document.getElementById('totalTerms').textContent = flashcards.length;
+        flashcards.forEach((card, index) => {
+            const div = document.createElement('div');
+            div.className = 'bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-indigo-500 transition cursor-pointer';
+            div.innerHTML = `
+                <h4 class="font-bold text-indigo-400 mb-2">${card.term}</h4>
+                <p class="text-sm text-gray-400">${card.definition.substring(0, 80)}...</p>
+            `;
+            div.onclick = () => {
+                currentCardIndex = index;
+                updateCard();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.getElementById('studyMode').click();
+            };
+            termsList.appendChild(div);
+        });
+
+        // Initialize
+        loadProgress();
+        updateCard();
+    </script>
+
+</body>
+</html>

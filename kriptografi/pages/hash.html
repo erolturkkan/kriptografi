@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Fonksiyonları - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800/80 backdrop-blur-xl border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-green-400 hover:text-green-300 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                    
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+
+        <!-- Header Section with Tabs -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-5xl font-bold text-white mb-2">Hash Araçları</h1>
+            <p class="text-gray-400 mb-6">Veri bütünlüğünü kontrol edin ve parola güvenliğini test edin</p>
+            
+            <div class="flex justify-center space-x-2 md:space-x-4 bg-gray-800/50 backdrop-blur p-2 rounded-xl max-w-2xl mx-auto border border-gray-700">
+                <button id="integrityBtn" class="tab-btn flex-1 py-3 px-4 md:px-6 rounded-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-300 hover:bg-gray-700">
+                    <span class="hidden md:inline">🔐 Bütünlük Denetleyicisi</span>
+                    <span class="md:hidden">🔐 Bütünlük</span>
+                </button>
+                <button id="crackerBtn" class="tab-btn flex-1 py-3 px-4 md:px-6 rounded-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-300 hover:bg-gray-700">
+                    <span class="hidden md:inline">🛡️ Parola Güvenlik Simülatörü</span>
+                    <span class="md:hidden">🛡️ Güvenlik</span>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <!-- View 1: Hash Generator & Integrity Checker -->
+            <div id="integrityChecker" class="animate-fadeIn">
+                <div class="bg-gray-800/30 backdrop-blur-xl border border-gray-700 rounded-2xl p-6 md:p-8 shadow-2xl">
+                    <div class="flex flex-col lg:flex-row items-start justify-center gap-6">
+                        <!-- Left Side: Text 1 -->
+                        <div class="w-full lg:w-1/2 flex flex-col gap-3">
+                            <label for="text1" class="text-lg font-semibold text-green-400 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Metin 1
+                            </label>
+                            <textarea id="text1" rows="8" class="w-full p-4 bg-gray-900/50 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-green-400 transition-colors resize-none backdrop-blur text-gray-100" placeholder="İlk metni buraya yazın..."></textarea>
+                            <div class="bg-gray-900/70 p-3 rounded-lg border border-gray-700">
+                                <div class="text-xs text-gray-400 mb-1">SHA-256 Hash:</div>
+                                <input type="text" id="hash1" readonly class="w-full p-2 bg-transparent font-mono text-xs text-green-400 break-all">
+                            </div>
+                        </div>
+
+                        <!-- Status Indicator -->
+                        <div class="w-full lg:w-auto flex items-center justify-center py-4 lg:pt-12">
+                            <div id="statusIndicator" class="text-base md:text-lg font-bold transition-all duration-300 px-6 py-3 rounded-xl border-2 border-gray-600 bg-gray-900/50 backdrop-blur min-w-[200px] text-center">
+                                <div class="text-gray-500">Beklemede...</div>
+                            </div>
+                        </div>
+
+                        <!-- Right Side: Text 2 -->
+                        <div class="w-full lg:w-1/2 flex flex-col gap-3">
+                            <label for="text2" class="text-lg font-semibold text-green-400 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Metin 2
+                            </label>
+                            <textarea id="text2" rows="8" class="w-full p-4 bg-gray-900/50 border-2 border-gray-700 rounded-xl focus:outline-none focus:border-green-400 transition-colors resize-none backdrop-blur text-gray-100" placeholder="İkinci metni buraya yazın..."></textarea>
+                            <div class="bg-gray-900/70 p-3 rounded-lg border border-gray-700">
+                                <div class="text-xs text-gray-400 mb-1">SHA-256 Hash:</div>
+                                <input type="text" id="hash2" readonly class="w-full p-2 bg-transparent font-mono text-xs text-green-400 break-all">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Section -->
+                    <div class="mt-8 bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-700/30 rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-green-400 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Hash Fonksiyonları Nedir?
+                        </h3>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            Hash fonksiyonları, herhangi bir boyuttaki veriyi sabit uzunlukta benzersiz bir değere (hash) dönüştürür. 
+                            Aynı veri her zaman aynı hash'i üretir, ancak küçük bir değişiklik bile tamamen farklı bir hash oluşturur. 
+                            Bu özellik sayesinde dosya bütünlüğü kontrolü, parola doğrulama ve dijital imza gibi işlemlerde kullanılır.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 2: Password Security Simulator -->
+            <div id="passwordCracker" class="hidden animate-fadeIn">
+                <div class="max-w-4xl mx-auto bg-gray-800/30 backdrop-blur-xl border border-gray-700 rounded-2xl p-6 md:p-8 shadow-2xl">
+                    <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-3">Parola Kırma Simülasyonu</h2>
+                    <p class="text-center text-gray-400 mb-8">
+                        Zayıf parolaların neden güvensiz olduğunu ve uzun parolaların neden önemli olduğunu adımlar halinde görelim.
+                    </p>
+                    
+                    <!-- Step Buttons -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <button id="weakPassBtn" class="group bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl">
+                            <div class="text-sm opacity-80">Adım 1</div>
+                            <div class="text-lg">⚠️ Zayıf Parola</div>
+                        </button>
+                        <button id="mediumPassBtn" class="group bg-gradient-to-br from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-gray-900 font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl">
+                            <div class="text-sm opacity-80">Adım 2</div>
+                            <div class="text-lg">⚡ Orta Seviye</div>
+                        </button>
+                        <button id="strongPassBtn" class="group bg-gradient-to-br from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-gray-900 font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl">
+                            <div class="text-sm opacity-80">Adım 3</div>
+                            <div class="text-lg">🛡️ Güçlü Passphrase</div>
+                        </button>
+                    </div>
+
+                    <!-- Simulation Area -->
+                    <div class="space-y-4 bg-gray-900/50 backdrop-blur p-6 rounded-xl border border-gray-700">
+                        <div>
+                            <label for="testPassword" class="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                </svg>
+                                Test Edilen Parola:
+                            </label>
+                            <input type="text" id="testPassword" class="w-full p-3 bg-gray-800 border border-gray-600 font-mono text-sm rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none transition-all" placeholder="Bir parola girin veya bir adım seçin...">
+                        </div>
+                        <div>
+                            <label for="testHash" class="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                </svg>
+                                Oluşturulan SHA-256 Hash:
+                            </label>
+                            <input type="text" id="testHash" readonly class="w-full p-3 bg-gray-900 border border-gray-700 font-mono text-xs text-green-400 rounded-lg break-all">
+                        </div>
+                        <button id="manualCrackButton" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-gray-900 font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl">
+                            🔓 Bu Parolayı Kırmayı Dene
+                        </button>
+                    </div>
+
+                    <!-- Result Area -->
+                    <div class="mt-8 text-center min-h-[160px] bg-gradient-to-br from-gray-900/70 to-gray-800/70 backdrop-blur p-6 rounded-xl border-2 border-gray-700 flex flex-col justify-center">
+                        <p id="crackerResult" class="font-bold text-xl md:text-2xl min-h-[32px] mb-3"></p>
+                        <p id="crackerExplanation" class="text-gray-300 text-sm md:text-base leading-relaxed max-w-2xl mx-auto"></p>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="mt-8 bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border border-blue-700/30 rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-blue-400 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                            💡 Güçlü Parola İpuçları
+                        </h3>
+                        <ul class="text-gray-300 text-sm space-y-2">
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-400">✓</span>
+                                <span>En az 12-16 karakter uzunluğunda passphrase (kelime öbekleri) kullanın</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-400">✓</span>
+                                <span>Büyük/küçük harf, rakam ve özel karakterler karıştırın</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-400">✗</span>
+                                <span>Sözlükte bulunan basit kelimeler veya yaygın kombinasyonlar kullanmayın</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-400">✗</span>
+                                <span>Doğum tarihi, telefon numarası gibi kişisel bilgiler içermesin</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const integrityBtn = document.getElementById('integrityBtn');
+            const crackerBtn = document.getElementById('crackerBtn');
+            const integrityCheckerView = document.getElementById('integrityChecker');
+            const passwordCrackerView = document.getElementById('passwordCracker');
+
+            function switchMode(mode) {
+                if (mode === 'integrity') {
+                    integrityCheckerView.classList.remove('hidden');
+                    passwordCrackerView.classList.add('hidden');
+                    integrityBtn.classList.add('active');
+                    crackerBtn.classList.remove('active');
+                } else {
+                    integrityCheckerView.classList.add('hidden');
+                    passwordCrackerView.classList.remove('hidden');
+                    integrityBtn.classList.remove('active');
+                    crackerBtn.classList.add('active');
+                }
+            }
+
+            integrityBtn.addEventListener('click', () => switchMode('integrity'));
+            crackerBtn.addEventListener('click', () => switchMode('cracker'));
+
+            const text1 = document.getElementById('text1');
+            const text2 = document.getElementById('text2');
+            const hash1Display = document.getElementById('hash1');
+            const hash2Display = document.getElementById('hash2');
+            const statusIndicator = document.getElementById('statusIndicator');
+
+            function bufferToHex(buffer) {
+                return [...new Uint8Array(buffer)]
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+            }
+
+            async function calculateSHA256(str) {
+                if (typeof str !== 'string') return '';
+                const textAsBuffer = new TextEncoder().encode(str);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', textAsBuffer);
+                return bufferToHex(hashBuffer);
+            }
+
+            function compareHashes() {
+                const h1 = hash1Display.value;
+                const h2 = hash2Display.value;
+                if (!h1 && !h2) {
+                    statusIndicator.innerHTML = '<div class="text-gray-500">Beklemede...</div>';
+                    return;
+                }
+                if (h1 === h2) {
+                    statusIndicator.innerHTML = '<div class="text-green-400">✓ HASH\'LER EŞLEŞİYOR</div>';
+                    statusIndicator.classList.add('border-green-500', 'bg-green-900/30');
+                    statusIndicator.classList.remove('border-red-500', 'bg-red-900/30', 'border-gray-600');
+                } else {
+                    statusIndicator.innerHTML = '<div class="text-red-400">✗ HASH\'LER FARKLI</div>';
+                    statusIndicator.classList.add('border-red-500', 'bg-red-900/30');
+                    statusIndicator.classList.remove('border-green-500', 'bg-green-900/30', 'border-gray-600');
+                }
+            }
+            
+            async function handleTextInput(event, displayElement) {
+                const text = event.target.value;
+                const hash = await calculateSHA256(text);
+                displayElement.value = hash;
+                compareHashes();
+            }
+
+            text1.addEventListener('input', (e) => handleTextInput(e, hash1Display));
+            text2.addEventListener('input', (e) => handleTextInput(e, hash2Display));
+            
+            const weakPassBtn = document.getElementById('weakPassBtn');
+            const mediumPassBtn = document.getElementById('mediumPassBtn');
+            const strongPassBtn = document.getElementById('strongPassBtn');
+            const manualCrackButton = document.getElementById('manualCrackButton');
+            const testPasswordInput = document.getElementById('testPassword');
+            const testHashInput = document.getElementById('testHash');
+            const crackerResult = document.getElementById('crackerResult');
+            const crackerExplanation = document.getElementById('crackerExplanation');
+
+            const commonPasswords = [
+                '123456', 'password', '123456789', '12345', '12345678', 'qwerty', '1234567', '111111', 
+                'Galatasaray1905!', 'iloveyou', 'p@$$w0rd', 'secret', 'admin', 'welcome', 'football'
+            ];
+            
+            const hashedPasswordsMap = new Map();
+
+            async function precomputeHashes() {
+                for (const pass of commonPasswords) {
+                    const hash = await calculateSHA256(pass);
+                    hashedPasswordsMap.set(hash, pass);
+                }
+            }
+
+            async function runCrackingSimulation(password, type) {
+                if (!password) {
+                    crackerResult.textContent = "⚠️ Lütfen bir parola girin";
+                    crackerResult.className = "font-bold text-xl md:text-2xl min-h-[32px] mb-3 text-yellow-400";
+                    crackerExplanation.textContent = "";
+                    return;
+                }
+                
+                testPasswordInput.value = password;
+                const hash = await calculateSHA256(password);
+                testHashInput.value = hash;
+
+                crackerResult.textContent = '🔍 Parola aranıyor...';
+                crackerResult.className = 'font-bold text-xl md:text-2xl min-h-[32px] mb-3 text-gray-400';
+                crackerExplanation.textContent = "Simülasyon, yaygın parola veritabanını kontrol ediyor...";
+
+                setTimeout(() => {
+                    if (hashedPasswordsMap.has(hash)) {
+                        const foundPassword = hashedPasswordsMap.get(hash);
+                        crackerResult.textContent = `🚨 PAROLA BULUNDU: "${foundPassword}"`;
+                        crackerResult.className = 'font-bold text-xl md:text-2xl min-h-[32px] mb-3 text-red-500';
+                        if (type === 'weak' || type === 'medium') {
+                            crackerExplanation.textContent = "⚠️ Bu parola, sık kullanılan parolaların hash'lerinin tutulduğu 'gökkuşağı tablolarında' (rainbow tables) anında bulundu. Bu yüzden güvensizdir ve kolayca kırılabilir.";
+                        }
+                    } else {
+                        crackerResult.textContent = '✅ PAROLA BULUNAMADI';
+                        crackerResult.className = 'font-bold text-xl md:text-2xl min-h-[32px] mb-3 text-green-400';
+                        if (type === 'strong') {
+                           crackerExplanation.textContent = "🛡️ Bu uzun ve öngörülemez passphrase, veritabanımızda bulunamadı. Kaba kuvvet saldırısıyla kırılması yıllar sürer. İşte bu yüzden uzun ve karmaşık parolalar güvenlidir!";
+                        } else {
+                            crackerExplanation.textContent = "ℹ️ Bu parola bizim küçük veritabanımızda yok, ancak daha büyük listelerde bulunabilir. Daha uzun ve karmaşık bir parola kullanmanız önerilir.";
+                        }
+                    }
+                }, 1200);
+            }
+
+            weakPassBtn.addEventListener('click', () => runCrackingSimulation('123456', 'weak'));
+            mediumPassBtn.addEventListener('click', () => runCrackingSimulation('Galatasaray1905!', 'medium'));
+            strongPassBtn.addEventListener('click', () => runCrackingSimulation('istanbul-icin-marti-sesi-gibisi-yok', 'strong'));
+            manualCrackButton.addEventListener('click', () => runCrackingSimulation(testPasswordInput.value, 'manual'));
+
+            async function initialize() {
+                await precomputeHashes();
+                switchMode('integrity');
+            }
+
+            initialize();
+        });
+    </script>
+</body>
+</html>
+                    <div class="space-y-4 bg-gray-900 p-4 rounded-lg">
+                        <div>
+                            <label for="testPassword" class="block text-sm font-medium text-gray-400 mb-1">Test Edilen Parola:</label>
+                            <input type="text" id="testPassword" class="w-full p-2 bg-gray-700 font-mono text-sm rounded-md border border-gray-600" placeholder="Bir parola girin veya bir adım seçin...">
+                        </div>
+                        <div>
+                            <label for="testHash" class="block text-sm font-medium text-gray-400 mb-1">Oluşturulan SHA-256 Hash:</label>
+                            <input type="text" id="testHash" readonly class="w-full p-2 bg-gray-700 font-mono text-sm text-gray-400 rounded-md border border-gray-600">
+                        </div>
+                        <button id="manualCrackButton" class="w-full bg-teal-500 hover:bg-teal-600 text-gray-900 font-bold py-2 px-4 rounded-lg transition-colors">Bu Parolayı Kırmayı Dene</button>
+                    </div>
+
+                    <!-- Result Area -->
+                    <div class="mt-6 text-center min-h-[120px] bg-gray-900 p-4 rounded-lg flex flex-col justify-center">
+                         <p id="crackerResult" class="font-bold text-xl h-8"></p>
+                         <p id="crackerExplanation" class="text-gray-400 mt-2"></p>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Common Elements ---
+            const integrityBtn = document.getElementById('integrityBtn');
+            const crackerBtn = document.getElementById('crackerBtn');
+            const integrityCheckerView = document.getElementById('integrityChecker');
+            const passwordCrackerView = document.getElementById('passwordCracker');
+
+            // --- Mode Switching Logic ---
+            function switchMode(mode) {
+                if (mode === 'integrity') {
+                    integrityCheckerView.classList.remove('hidden');
+                    passwordCrackerView.classList.add('hidden');
+                    integrityBtn.classList.add('btn-active');
+                    crackerBtn.classList.remove('btn-active');
+                } else {
+                    integrityCheckerView.classList.add('hidden');
+                    passwordCrackerView.classList.remove('hidden');
+                    integrityBtn.classList.remove('btn-active');
+                    crackerBtn.classList.add('btn-active');
+                }
+            }
+
+            integrityBtn.addEventListener('click', () => switchMode('integrity'));
+            crackerBtn.addEventListener('click', () => switchMode('cracker'));
+
+            // --- Hashing & Integrity Checker Logic ---
+            const text1 = document.getElementById('text1');
+            const text2 = document.getElementById('text2');
+            const hash1Display = document.getElementById('hash1');
+            const hash2Display = document.getElementById('hash2');
+            const statusIndicator = document.getElementById('statusIndicator');
+
+            function bufferToHex(buffer) {
+                return [...new Uint8Array(buffer)]
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+            }
+
+            async function calculateSHA256(str) {
+                if (typeof str !== 'string') return '';
+                const textAsBuffer = new TextEncoder().encode(str);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', textAsBuffer);
+                return bufferToHex(hashBuffer);
+            }
+
+            function compareHashes() {
+                const h1 = hash1Display.value;
+                const h2 = hash2Display.value;
+                if (!h1 && !h2) {
+                    statusIndicator.textContent = '';
+                    return;
+                }
+                if (h1 === h2) {
+                    statusIndicator.textContent = "HASH'LER EŞLEŞİYOR";
+                    statusIndicator.classList.remove('text-red-500');
+                    statusIndicator.classList.add('text-green-400');
+                } else {
+                    statusIndicator.textContent = "HASH'LER FARKLI";
+                    statusIndicator.classList.remove('text-green-400');
+                    statusIndicator.classList.add('text-red-500');
+                }
+            }
+            
+            async function handleTextInput(event, displayElement) {
+                const text = event.target.value;
+                const hash = await calculateSHA256(text);
+                displayElement.value = hash;
+                compareHashes();
+            }
+
+            text1.addEventListener('input', (e) => handleTextInput(e, hash1Display));
+            text2.addEventListener('input', (e) => handleTextInput(e, hash2Display));
+            
+            // --- Password Cracker Logic ---
+            const weakPassBtn = document.getElementById('weakPassBtn');
+            const mediumPassBtn = document.getElementById('mediumPassBtn');
+            const strongPassBtn = document.getElementById('strongPassBtn');
+            const manualCrackButton = document.getElementById('manualCrackButton');
+            const testPasswordInput = document.getElementById('testPassword');
+            const testHashInput = document.getElementById('testHash');
+            const crackerResult = document.getElementById('crackerResult');
+            const crackerExplanation = document.getElementById('crackerExplanation');
+
+            const commonPasswords = [
+                '123456', 'password', '123456789', '12345', '12345678', 'qwerty', '1234567', '111111', 
+                'Galatasaray1905!', 'iloveyou', 'p@$$w0rd', 'secret', 'admin', 'welcome', 'football'
+                // We keep this list short for the simulation's purpose.
+            ];
+            
+            const hashedPasswordsMap = new Map();
+
+            async function precomputeHashes() {
+                for (const pass of commonPasswords) {
+                    const hash = await calculateSHA256(pass);
+                    hashedPasswordsMap.set(hash, pass);
+                }
+            }
+
+            async function runCrackingSimulation(password, type) {
+                if (!password) {
+                    crackerResult.textContent = "Lütfen bir parola girin.";
+                    crackerResult.className = "font-bold text-xl h-8 text-yellow-400";
+                    crackerExplanation.textContent = "";
+                    return;
+                }
+                
+                testPasswordInput.value = password;
+                const hash = await calculateSHA256(password);
+                testHashInput.value = hash;
+
+                crackerResult.textContent = 'Parola aranıyor...';
+                crackerResult.className = 'font-bold text-xl h-8 text-gray-400';
+                crackerExplanation.textContent = "Simülasyon, küçük parola veritabanını kontrol ediyor.";
+
+                setTimeout(() => {
+                    if (hashedPasswordsMap.has(hash)) {
+                        const foundPassword = hashedPasswordsMap.get(hash);
+                        crackerResult.textContent = `PAROLA BULUNDU: ${foundPassword}`;
+                        crackerResult.className = 'font-bold text-xl h-8 text-red-500';
+                        if (type === 'weak' || type === 'medium') {
+                            crackerExplanation.textContent = "Bu parola, sık kullanılan parolaların hash'lerinin tutulduğu 'gökkuşağı tablolarında' (rainbow tables) anında bulundu. Bu yüzden güvensizdir.";
+                        }
+                    } else {
+                        crackerResult.textContent = 'PAROLA BULUNAMADI';
+                        crackerResult.className = 'font-bold text-xl h-8 text-green-400';
+                        if (type === 'strong') {
+                           crackerExplanation.textContent = "Bu uzun ve öngörülemez parola, veritabanımızda bulunamadı. Kaba kuvvet saldırısıyla kırılması yıllar sürer. İşte bu yüzden 'passphrase'ler güvenlidir.";
+                        } else {
+                            crackerExplanation.textContent = "Bu parola, bizim küçük veritabanımızda yok ama daha büyük listelerde olabilir.";
+                        }
+                    }
+                }, 1000); // Simulate a 1-second delay
+            }
+
+            weakPassBtn.addEventListener('click', () => runCrackingSimulation('123456', 'weak'));
+            mediumPassBtn.addEventListener('click', () => runCrackingSimulation('Galatasaray1905!', 'medium'));
+            strongPassBtn.addEventListener('click', () => runCrackingSimulation('istanbul-icin-marti-sesi-gibisi-yok', 'strong'));
+            manualCrackButton.addEventListener('click', () => runCrackingSimulation(testPasswordInput.value, 'manual'));
+
+            // --- Initializations ---
+            async function initialize() {
+                await precomputeHashes();
+                handleTextInput({ target: { value: '' }}, hash1Display);
+                handleTextInput({ target: { value: '' }}, hash2Display);
+            }
+
+            initialize();
+        });
+    </script>
+</body>
+</html>
+

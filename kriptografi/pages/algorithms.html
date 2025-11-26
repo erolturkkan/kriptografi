@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifreleme Algoritmaları - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-cyan-400 hover:text-cyan-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                    
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <!-- Introduction -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 mb-8 border border-gray-700">
+            <h2 class="text-3xl font-bold text-white mb-4">🔐 Simetrik Şifreleme Algoritmaları</h2>
+            <p class="text-gray-300 text-lg leading-relaxed mb-4">
+                Simetrik şifreleme, aynı anahtarın hem şifreleme hem de deşifreleme için kullanıldığı 
+                kriptografi yöntemidir. Modern sistemlerde AES en yaygın kullanılan standarttır.
+            </p>
+            <div class="bg-cyan-900/20 border border-cyan-700 rounded-lg p-4">
+                <p class="text-cyan-300">
+                    <strong>💡 Önemli:</strong> Simetrik şifreleme çok hızlıdır ancak anahtar paylaşımı 
+                    güvenli bir şekilde yapılmalıdır. Bu nedenle genellikle asimetrik şifreleme ile birlikte kullanılır.
+                </p>
+            </div>
+        </section>
+
+        <!-- Algorithm Comparison -->
+        <section class="mb-8">
+            <h3 class="text-2xl font-bold text-white mb-6">📊 Algoritma Karşılaştırması</h3>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="p-4 text-left text-cyan-400 font-semibold">Algoritma</th>
+                            <th class="p-4 text-left text-cyan-400 font-semibold">Anahtar Uzunluğu</th>
+                            <th class="p-4 text-left text-cyan-400 font-semibold">Blok Boyutu</th>
+                            <th class="p-4 text-left text-cyan-400 font-semibold">Hız</th>
+                            <th class="p-4 text-left text-cyan-400 font-semibold">Güvenlik</th>
+                            <th class="p-4 text-left text-cyan-400 font-semibold">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-700">
+                        <tr class="hover:bg-gray-750">
+                            <td class="p-4">
+                                <div class="font-bold text-white">AES</div>
+                                <div class="text-sm text-gray-400">Advanced Encryption Standard</div>
+                            </td>
+                            <td class="p-4 text-gray-300">128, 192, 256 bit</td>
+                            <td class="p-4 text-gray-300">128 bit</td>
+                            <td class="p-4">
+                                <span class="bg-green-900 text-green-300 px-2 py-1 rounded text-sm">Çok Hızlı</span>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-green-900 text-green-300 px-2 py-1 rounded text-sm">Çok Güvenli</span>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-blue-900 text-blue-300 px-2 py-1 rounded text-sm">Aktif Standart</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-750">
+                            <td class="p-4">
+                                <div class="font-bold text-white">Twofish</div>
+                                <div class="text-sm text-gray-400">AES finalisti</div>
+                            </td>
+                            <td class="p-4 text-gray-300">128, 192, 256 bit</td>
+                            <td class="p-4 text-gray-300">128 bit</td>
+                            <td class="p-4">
+                                <span class="bg-yellow-900 text-yellow-300 px-2 py-1 rounded text-sm">Hızlı</span>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-green-900 text-green-300 px-2 py-1 rounded text-sm">Çok Güvenli</span>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded text-sm">Alternatif</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-750">
+                            <td class="p-4">
+                                <div class="font-bold text-white">Blowfish</div>
+                                <div class="text-sm text-gray-400">Bruce Schneier tasarımı</div>
+                            </td>
+                            <td class="p-4 text-gray-300">32-448 bit</td>
+                            <td class="p-4 text-gray-300">64 bit</td>
+                            <td class="p-4">
+                                <span class="bg-green-900 text-green-300 px-2 py-1 rounded text-sm">Çok Hızlı</span>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-yellow-900 text-yellow-300 px-2 py-1 rounded text-sm">Orta</span>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-yellow-900 text-yellow-300 px-2 py-1 rounded text-sm">Eski</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-750">
+                            <td class="p-4">
+                                <div class="font-bold text-white">3DES</div>
+                                <div class="text-sm text-gray-400">Triple Data Encryption Standard</div>
+                            </td>
+                            <td class="p-4 text-gray-300">168 bit (3x56)</td>
+                            <td class="p-4 text-gray-300">64 bit</td>
+                            <td class="p-4">
+                                <span class="bg-red-900 text-red-300 px-2 py-1 rounded text-sm">Yavaş</span>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-yellow-900 text-yellow-300 px-2 py-1 rounded text-sm">Orta</span>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-red-900 text-red-300 px-2 py-1 rounded text-sm">Kullanımdan Kalkıyor</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-750">
+                            <td class="p-4">
+                                <div class="font-bold text-white">ChaCha20</div>
+                                <div class="text-sm text-gray-400">Stream cipher</div>
+                            </td>
+                            <td class="p-4 text-gray-300">256 bit</td>
+                            <td class="p-4 text-gray-300">Stream</td>
+                            <td class="p-4">
+                                <span class="bg-green-900 text-green-300 px-2 py-1 rounded text-sm">Çok Hızlı</span>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-green-900 text-green-300 px-2 py-1 rounded text-sm">Çok Güvenli</span>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-blue-900 text-blue-300 px-2 py-1 rounded text-sm">Modern</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Detailed Cards -->
+        <section>
+            <h3 class="text-2xl font-bold text-white mb-6">🔍 Detaylı İnceleme</h3>
+            
+            <div class="space-y-6">
+                
+                <!-- AES -->
+                <div class="bg-gray-800 rounded-xl p-6 border-l-4 border-green-500">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h4 class="text-2xl font-bold text-white mb-2">AES (Advanced Encryption Standard)</h4>
+                            <p class="text-gray-400">En yaygın kullanılan modern şifreleme standardı</p>
+                        </div>
+                        <span class="bg-green-900 text-green-300 px-3 py-1 rounded-full text-sm font-semibold">ÖNERİLİR</span>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-4">
+                        <div>
+                            <h5 class="font-semibold text-gray-200 mb-2">✅ Avantajlar</h5>
+                            <ul class="list-disc list-inside text-gray-400 space-y-1 text-sm">
+                                <li>ABD hükümeti tarafından onaylı</li>
+                                <li>Donanımsal hızlandırma desteği (AES-NI)</li>
+                                <li>Çok iyi incelenmiş ve test edilmiş</li>
+                                <li>Üç farklı anahtar uzunluğu seçeneği</li>
+                                <li>Tüm modern sistemlerde desteklenir</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-200 mb-2">📋 Kullanım Alanları</h5>
+                            <ul class="list-disc list-inside text-gray-400 space-y-1 text-sm">
+                                <li>Wi-Fi şifreleme (WPA2/WPA3)</li>
+                                <li>VPN bağlantıları</li>
+                                <li>Dosya ve disk şifreleme</li>
+                                <li>HTTPS/TLS iletişimi</li>
+                                <li>Veritabanı şifreleme</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-900 rounded-lg p-4">
+                        <h5 class="font-semibold text-gray-200 mb-2">⚙️ Teknik Detaylar</h5>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-400">Tasarımcılar:</span>
+                                <span class="text-white ml-2">Rijmen & Daemen</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">Yıl:</span>
+                                <span class="text-white ml-2">2001</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">Yapı:</span>
+                                <span class="text-white ml-2">Substitution-Permutation Network</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Twofish -->
+                <div class="bg-gray-800 rounded-xl p-6 border-l-4 border-blue-500">
+                    <h4 class="text-2xl font-bold text-white mb-2">Twofish</h4>
+                    <p class="text-gray-400 mb-4">AES yarışmasının finalistlerinden, güvenli bir alternatif</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-4">
+                        <div>
+                            <h5 class="font-semibold text-gray-200 mb-2">✅ Avantajlar</h5>
+                            <ul class="list-disc list-inside text-gray-400 space-y-1 text-sm">
+                                <li>Çok esnek anahtar planı</li>
+                                <li>Güçlü kriptanaliz direnci</li>
+                                <li>Açık kaynak ve patent-free</li>
+                                <li>Düşük bellek gereksinimi</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-200 mb-2">❌ Dezavantajlar</h5>
+                            <ul class="list-disc list-inside text-gray-400 space-y-1 text-sm">
+                                <li>AES'den daha yavaş (yazılımda)</li>
+                                <li>Donanımsal destek sınırlı</li>
+                                <li>AES kadar yaygın değil</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-900 rounded-lg p-4">
+                        <p class="text-sm text-gray-300">
+                            <strong>💡 Ne zaman kullanılır:</strong> AES donanım desteğinin olmadığı 
+                            gömülü sistemlerde veya ekstra güvenlik katmanı istenen durumlarda tercih edilebilir.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Blowfish -->
+                <div class="bg-gray-800 rounded-xl p-6 border-l-4 border-yellow-500">
+                    <h4 class="text-2xl font-bold text-white mb-2">Blowfish</h4>
+                    <p class="text-gray-400 mb-4">Bruce Schneier tarafından tasarlanan hızlı algoritma</p>
+                    
+                    <div class="bg-yellow-900/20 border border-yellow-700 rounded-lg p-4 mb-4">
+                        <p class="text-yellow-300 text-sm">
+                            <strong>⚠️ Uyarı:</strong> 64-bit blok boyutu nedeniyle büyük veri setlerinde 
+                            güvenlik sorunları olabilir. Yeni projeler için önerilmez.
+                        </p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h5 class="font-semibold text-gray-200 mb-2">✅ Güçlü Yönler</h5>
+                            <ul class="list-disc list-inside text-gray-400 space-y-1 text-sm">
+                                <li>Çok hızlı başlatma</li>
+                                <li>Basit uygulama</li>
+                                <li>Değişken anahtar uzunluğu</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-200 mb-2">📌 Tarihçe</h5>
+                            <p class="text-gray-400 text-sm">
+                                1993'te tasarlandı ve DES'in yerini almak için geliştirildi. 
+                                Yerine geçeni olan Twofish, Blowfish'in zayıflıklarını gidermek için tasarlandı.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ChaCha20 -->
+                <div class="bg-gray-800 rounded-xl p-6 border-l-4 border-purple-500">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h4 class="text-2xl font-bold text-white mb-2">ChaCha20</h4>
+                            <p class="text-gray-400">Modern stream cipher, mobil cihazlar için optimize</p>
+                        </div>
+                        <span class="bg-purple-900 text-purple-300 px-3 py-1 rounded-full text-sm font-semibold">MODERN</span>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-4">
+                        <div>
+                            <h5 class="font-semibold text-gray-200 mb-2">✅ Avantajlar</h5>
+                            <ul class="list-disc list-inside text-gray-400 space-y-1 text-sm">
+                                <li>Mobil cihazlarda AES'den daha hızlı</li>
+                                <li>Zamanlama saldırılarına karşı dirençli</li>
+                                <li>Basit ve güvenli tasarım</li>
+                                <li>Google tarafından yaygın kullanım (TLS)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-200 mb-2">📋 Kullanım Alanları</h5>
+                            <ul class="list-disc list-inside text-gray-400 space-y-1 text-sm">
+                                <li>WireGuard VPN</li>
+                                <li>Google Chrome (TLS)</li>
+                                <li>SSH bağlantıları</li>
+                                <li>Mobil uygulama şifreleme</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-900 rounded-lg p-4">
+                        <p class="text-sm text-gray-300">
+                            <strong>💡 Özellik:</strong> Poly1305 MAC ile birlikte kullanıldığında (ChaCha20-Poly1305) 
+                            hem şifreleme hem de kimlik doğrulama sağlar.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Recommendation -->
+        <section class="mt-8 bg-gradient-to-r from-cyan-900 to-blue-900 rounded-xl p-8 border border-cyan-700">
+            <h3 class="text-2xl font-bold text-white mb-4">🎯 Hangi Algoritmayı Seçmeliyim?</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-gray-900/50 rounded-lg p-4">
+                    <div class="text-3xl mb-3">🖥️</div>
+                    <h4 class="font-bold text-cyan-300 mb-2">Genel Amaçlı</h4>
+                    <p class="text-gray-300 text-sm mb-2">Standart uygulamalar için</p>
+                    <p class="text-white font-semibold">→ AES-256</p>
+                </div>
+                <div class="bg-gray-900/50 rounded-lg p-4">
+                    <div class="text-3xl mb-3">📱</div>
+                    <h4 class="font-bold text-cyan-300 mb-2">Mobil Cihazlar</h4>
+                    <p class="text-gray-300 text-sm mb-2">Düşük güç tüketimi için</p>
+                    <p class="text-white font-semibold">→ ChaCha20</p>
+                </div>
+                <div class="bg-gray-900/50 rounded-lg p-4">
+                    <div class="text-3xl mb-3">🔒</div>
+                    <h4 class="font-bold text-cyan-300 mb-2">Ekstra Güvenlik</h4>
+                    <p class="text-gray-300 text-sm mb-2">Çift katmanlı şifreleme</p>
+                    <p class="text-white font-semibold">→ AES + Twofish</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+</body>
+</html>

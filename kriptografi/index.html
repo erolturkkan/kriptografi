@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kriptografi Öğrenim Platformu - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .icon-animate {
+            transition: transform 0.3s ease;
+        }
+        .card-hover:hover .icon-animate {
+            transform: scale(1.1) rotate(5deg);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        .bg-pattern {
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 47% 33%, hsla(250, 60%, 30%, 0.3) 0, transparent 59%), 
+                radial-gradient(at 82% 65%, hsla(280, 50%, 40%, 0.2) 0, transparent 55%);
+        }
+        #mobileMenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        #mobileMenu.open {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body class="bg-pattern text-gray-100 min-h-screen">
+
+    <nav class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <img src="assets/zt (160 x 160 piksel).svg" alt="Zero Trust Logo" class="w-10 h-10 object-contain">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text">
+                        Kriptografi Akademisi
+                    </h1>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#modules" class="hover:text-purple-400 transition">Modüller</a>
+                    <a href="pages/sunum.html" class="hover:text-purple-400 transition">Sunum</a>
+                    <a href="pages/scenario.html" class="hover:text-purple-400 transition">Senaryo</a>
+                    <a href="pages/ssl-workshop.html" class="hover:text-purple-400 transition">SSL Atölyesi</a>
+                    <a href="pages/assure.html" class="hover:text-purple-400 transition">ASSURE Modeli</a>
+                    <a href="pages/test.html" class="hover:text-purple-400 transition">Test</a>
+                    <a href="#about" class="hover:text-purple-400 transition">Hakkında</a>
+                </div>
+                <button id="menuBtn" class="md:hidden text-gray-300 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden">
+                <div class="py-4 space-y-3">
+                    <a href="#modules" class="block text-gray-300 hover:text-purple-400 transition py-2">📚 Modüller</a>
+                    <a href="pages/sunum.html" class="block text-gray-300 hover:text-purple-400 transition py-2">📊 Sunum</a>
+                    <a href="pages/scenario.html" class="block text-gray-300 hover:text-purple-400 transition py-2">🎯 Öğrenim Senaryosu</a>
+                    <a href="pages/ssl-workshop.html" class="block text-gray-300 hover:text-purple-400 transition py-2">🔐 SSL Atölyesi</a>
+                    <a href="pages/assure.html" class="block text-gray-300 hover:text-purple-400 transition py-2">📐 ASSURE Modeli</a>
+                    <a href="pages/test.html" class="block text-gray-300 hover:text-purple-400 transition py-2">📝 Test</a>
+                    <a href="#about" class="block text-gray-300 hover:text-purple-400 transition py-2">ℹ️ Hakkında</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="py-20 px-4">
+        <div class="container mx-auto max-w-6xl text-center">
+            <div class="float-animation inline-block mb-6">
+                <svg class="w-24 h-24 mx-auto text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.040A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+            </div>
+            <h2 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                İnteraktif Kriptografi<br/>
+                <span class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text">
+                    Öğrenim Platformu
+                </span>
+            </h2>
+            <p class="text-xl text-gray-400 mb-8 max-w-3xl mx-auto">
+                Steganografiden RSA'ya, hash fonksiyonlarından simetrik şifrelemeye kadar 
+                kriptografinin tüm yönlerini interaktif araçlar ve oyunlarla öğrenin.
+            </p>
+            <a href="#modules" class="inline-block gradient-bg text-white font-semibold px-8 py-4 rounded-full hover:opacity-90 transition shadow-lg">
+                Keşfetmeye Başla
+            </a>
+        </div>
+    </section>
+
+    <section id="modules" class="py-16 px-4">
+        <div class="container mx-auto max-w-7xl">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold mb-4">Kriptografi Modülleri</h3>
+                <p class="text-gray-400 text-lg">13 İnteraktif Modül ile Pratik Yaparak Öğrenin</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <a href="pages/sten.html" class="card-hover bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">Steganografi</h4>
+                    <p class="text-gray-400 mb-4">Görüntülerin içine mesaj gizleme ve çıkarma tekniklerini keşfedin.</p>
+                    <span class="inline-flex items-center text-blue-400 font-semibold">
+                        Uygulamayı Aç
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-blue-900/30 text-blue-300 text-xs px-3 py-1 rounded-full">İnteraktif</span>
+                    </div>
+                </a>
+
+                <a href="pages/hash.html" class="card-hover bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">Hash Fonksiyonları</h4>
+                    <p class="text-gray-400 mb-4">Veri bütünlüğü ve parola güvenliği için hash algoritmaları.</p>
+                    <span class="inline-flex items-center text-green-400 font-semibold">
+                        Uygulamayı Aç
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-green-900/30 text-green-300 text-xs px-3 py-1 rounded-full">İnteraktif</span>
+                    </div>
+                </a>
+
+                <a href="pages/rsa.html" class="card-hover bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">RSA Asimetrik Şifreleme</h4>
+                    <p class="text-gray-400 mb-4">Açık ve gizli anahtar mantığını uygulamalı olarak öğrenin.</p>
+                    <span class="inline-flex items-center text-purple-400 font-semibold">
+                        Uygulamayı Aç
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-purple-900/30 text-purple-300 text-xs px-3 py-1 rounded-full">İnteraktif</span>
+                    </div>
+                </a>
+
+                <a href="pages/caesar.html" class="card-hover bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">Sezar Şifresi</h4>
+                    <p class="text-gray-400 mb-4">Klasik simetrik şifreleme yöntemini deneyimleyin.</p>
+                    <span class="inline-flex items-center text-yellow-400 font-semibold">
+                        Uygulamayı Aç
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-yellow-900/30 text-yellow-300 text-xs px-3 py-1 rounded-full">İnteraktif</span>
+                    </div>
+                </a>
+
+                <a href="pages/hash-compare.html" class="card-hover bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">Hash Karşılaştırma</h4>
+                    <p class="text-gray-400 mb-4">MD5, SHA-1, SHA-256 ve daha fazlasını karşılaştırın.</p>
+                    <span class="inline-flex items-center text-red-400 font-semibold">
+                        Uygulamayı Aç
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-red-900/30 text-red-300 text-xs px-3 py-1 rounded-full">İnteraktif</span>
+                    </div>
+                </a>
+
+                <a href="pages/flashcards.html" class="card-hover bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">Bilgi Kartları</h4>
+                    <p class="text-gray-400 mb-4">Kriptografi terimlerini kartlarla öğrenin ve test edin.</p>
+                    <span class="inline-flex items-center text-indigo-400 font-semibold">
+                        Uygulamayı Aç
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-indigo-900/30 text-indigo-300 text-xs px-3 py-1 rounded-full">Eğitim</span>
+                    </div>
+                </a>
+
+                <a href="pages/crypto-game.html" class="card-hover bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">Şifreyi Çöz Oyunu</h4>
+                    <p class="text-gray-400 mb-4">Gizli mesajları çözerek kriptografi bilginizi test edin.</p>
+                    <span class="inline-flex items-center text-pink-400 font-semibold">
+                        Oyunu Başlat
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-pink-900/30 text-pink-300 text-xs px-3 py-1 rounded-full">Oyun</span>
+                    </div>
+                </a>
+
+                <a href="pages/algorithms.html" class="card-hover bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">Şifreleme Algoritmaları</h4>
+                    <p class="text-gray-400 mb-4">AES, DES ve diğer algoritmaları öğrenin.</p>
+                    <span class="inline-flex items-center text-cyan-400 font-semibold">
+                        Uygulamayı Aç
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-cyan-900/30 text-cyan-300 text-xs px-3 py-1 rounded-full">Bilgi</span>
+                    </div>
+                </a>
+
+                <a href="pages/otp.html" class="card-hover bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">One-Time Pad</h4>
+                    <p class="text-gray-400 mb-4">Tek kullanımlık şifreleme yöntemini deneyin.</p>
+                    <span class="inline-flex items-center text-orange-400 font-semibold">
+                        Uygulamayı Aç
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-orange-900/30 text-orange-300 text-xs px-3 py-1 rounded-full">İnteraktif</span>
+                    </div>
+                </a>
+
+                <!-- Scenario -->
+                <a href="pages/scenario.html" class="card-hover bg-gradient-to-br from-purple-800/30 to-pink-800/30 backdrop-blur-sm rounded-xl p-6 border-2 border-purple-500/50">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">Öğrenim Senaryosu</h4>
+                    <p class="text-gray-400 mb-4">Adım adım rehberlikle tüm araçları kullanarak öğrenin.</p>
+                    <span class="inline-flex items-center text-purple-400 font-semibold">
+                        Senaryoya Başla
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-purple-900/50 text-purple-200 text-xs px-3 py-1 rounded-full font-semibold">⭐ Önerilen</span>
+                    </div>
+                </a>
+
+                <!-- Presentation -->
+                <a href="pages/sunum.html" class="card-hover bg-gradient-to-br from-yellow-800/30 to-orange-800/30 backdrop-blur-sm rounded-xl p-6 border border-yellow-500/30">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">Kriptografi Sunumu</h4>
+                    <p class="text-gray-400 mb-4">PowerPoint sunumu ile kapsamlı kriptografi eğitimi.</p>
+                    <span class="inline-flex items-center text-yellow-400 font-semibold">
+                        Sunumu Görüntüle
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-yellow-900/30 text-yellow-300 text-xs px-3 py-1 rounded-full">📊 Sunum</span>
+                    </div>
+                </a>
+
+                <!-- SSL Workshop -->
+                <a href="pages/ssl-workshop.html" class="card-hover bg-gradient-to-br from-cyan-800/30 to-teal-800/30 backdrop-blur-sm rounded-xl p-6 border border-cyan-500/30">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">SSL Sertifikası Atölyesi</h4>
+                    <p class="text-gray-400 mb-4">Kendi SSL/TLS sertifikanı oluştur, HTTPS'yi anla.</p>
+                    <span class="inline-flex items-center text-cyan-400 font-semibold">
+                        Atölyeye Başla
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-cyan-900/30 text-cyan-300 text-xs px-3 py-1 rounded-full">🔐 Pratik</span>
+                    </div>
+                </a>
+
+                <!-- ASSURE Model -->
+                <a href="pages/assure.html" class="card-hover bg-gradient-to-br from-blue-800/30 to-indigo-800/30 backdrop-blur-sm rounded-xl p-6 border border-blue-500/30">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">ASSURE Modeli</h4>
+                    <p class="text-gray-400 mb-4">Kullandığımız öğretim tasarım modelini keşfedin.</p>
+                    <span class="inline-flex items-center text-blue-400 font-semibold">
+                        Detayları Gör
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-blue-900/30 text-blue-300 text-xs px-3 py-1 rounded-full">Öğretim Modeli</span>
+                    </div>
+                </a>
+
+                <!-- Test -->
+                <a href="pages/test.html" class="card-hover bg-gradient-to-br from-green-800/30 to-emerald-800/30 backdrop-blur-sm rounded-xl p-6 border border-green-500/30">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">Bilgi Testi</h4>
+                    <p class="text-gray-400 mb-4">Öğrendiklerinizi test edin ve sertifika alın.</p>
+                    <span class="inline-flex items-center text-green-400 font-semibold">
+                        Teste Başla
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3">
+                        <span class="inline-block bg-green-900/30 text-green-300 text-xs px-3 py-1 rounded-full">Değerlendirme</span>
+                    </div>
+                </a>
+
+                <!-- RSA Step by Step -->
+                <a href="pages/rsa-step1.html" class="card-hover bg-gradient-to-br from-purple-800/40 to-pink-800/40 backdrop-blur-sm rounded-xl p-6 border-2 border-purple-400/50 shadow-lg shadow-purple-500/20">
+                    <div class="icon-animate mb-4">
+                        <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-white">RSA Adım Adım</h4>
+                    <p class="text-gray-400 mb-4">RSA algoritmasını 3 adımda detaylı öğrenin: Anahtar Üretimi → Şifreleme → Şifre Çözme</p>
+                    <span class="inline-flex items-center text-purple-400 font-semibold">
+                        Öğrenmeye Başla
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <div class="mt-3 flex gap-2">
+                        <span class="inline-block bg-purple-900/50 text-purple-200 text-xs px-3 py-1 rounded-full font-semibold">📚 Eğitici</span>
+                        <span class="inline-block bg-pink-900/50 text-pink-200 text-xs px-3 py-1 rounded-full">3 Adım</span>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-16 px-4 bg-gray-900/30">
+        <div class="container mx-auto max-w-4xl text-center">
+            <h3 class="text-4xl font-bold mb-6">Platform Hakkında</h3>
+            <p class="text-gray-400 text-lg leading-relaxed mb-8">
+                Bu platform, kriptografi konusunu öğrenmek isteyen öğrenciler ve meraklılar için 
+                interaktif bir öğrenim deneyimi sunmak amacıyla geliştirilmiştir. Her modül, 
+                teorik bilgiyi pratikle birleştirerek konuyu daha iyi anlamanızı sağlar.
+            </p>
+            
+            <!-- ASSURE Model Info -->
+            <div class="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-2xl p-6 md:p-8 mb-8 text-left">
+                <h4 class="text-2xl font-bold text-white mb-3 text-center">📐 ASSURE Öğretim Modeli</h4>
+                <p class="text-gray-300 mb-4 text-center">
+                    Bu platform, <strong class="text-blue-400">ASSURE öğretim tasarım modeli</strong> kullanılarak geliştirilmiştir. 
+                    ASSURE, teknoloji destekli etkili öğretim için sistematik bir yaklaşımdır.
+                </p>
+                <div class="grid md:grid-cols-3 gap-4 mt-6">
+                    <div class="bg-blue-900/20 rounded-lg p-4 text-center">
+                        <div class="text-3xl mb-2">🎯</div>
+                        <div class="text-sm text-gray-400">Öğrenci Odaklı</div>
+                    </div>
+                    <div class="bg-purple-900/20 rounded-lg p-4 text-center">
+                        <div class="text-3xl mb-2">💻</div>
+                        <div class="text-sm text-gray-400">Teknoloji Entegre</div>
+                    </div>
+                    <div class="bg-indigo-900/20 rounded-lg p-4 text-center">
+                        <div class="text-3xl mb-2">📊</div>
+                        <div class="text-sm text-gray-400">Ölçülebilir Hedefler</div>
+                    </div>
+                </div>
+                <div class="text-center mt-6">
+                    <a href="pages/assure.html" class="inline-flex items-center text-blue-400 hover:text-blue-300 font-semibold">
+                        ASSURE Modeli Hakkında Detaylar
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+                <div class="text-center">
+                    <div class="text-5xl font-bold text-purple-400 mb-2">12</div>
+                    <div class="text-gray-400">İnteraktif Modül</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold text-pink-400 mb-2">100%</div>
+                    <div class="text-gray-400">Ücretsiz</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold text-blue-400 mb-2">∞</div>
+                    <div class="text-gray-400">Sınırsız Erişim</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900/50 border-t border-gray-800 py-8 px-4 mt-16">
+        <div class="container mx-auto max-w-6xl text-center">
+            <div class="flex items-center justify-center space-x-3 mb-4">
+                <img src="assets/zt (160 x 160 piksel).svg" alt="Zero Trust Logo" class="w-8 h-8 object-contain">
+                <span class="text-xl font-semibold">Zero Trust Kriptografi Akademisi</span>
+            </div>
+            <p class="text-gray-500 text-sm">
+                © 2025 Tüm hakları saklıdır. Eğitim amaçlı bir platformdur.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('open');
+        });
+
+        // Close mobile menu when clicking a link
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One-Time Pad (OTP) - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-orange-400 hover:text-orange-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                    
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <!-- Info Section -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 mb-8 border border-gray-700">
+            <h2 class="text-3xl font-bold text-white mb-4">🔐 One-Time Pad (OTP) Nedir?</h2>
+            <div class="text-gray-300 space-y-3">
+                <p>
+                    <strong>One-Time Pad (Tek Kullanımlık Anahtar)</strong>, matematiksel olarak kırılamaz 
+                    olduğu kanıtlanmış tek şifreleme yöntemidir. Bu yöntem, mesaj ile aynı uzunlukta 
+                    tamamen rastgele bir anahtar kullanır.
+                </p>
+                
+                <div class="bg-gray-900 rounded-lg p-4 my-4">
+                    <h3 class="font-semibold text-orange-400 mb-3">📋 OTP Kuralları (Çok Kritik!):</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-2">
+                            <span class="text-orange-400 mt-1">1.</span>
+                            <p><strong>Anahtar mesaj kadar uzun olmalı:</strong> Her karakter için bir anahtar biti</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-orange-400 mt-1">2.</span>
+                            <p><strong>Anahtar tamamen rastgele olmalı:</strong> Tahmin edilemez olmalı</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-orange-400 mt-1">3.</span>
+                            <p><strong>Anahtar sadece bir kez kullanılmalı:</strong> Tekrar kullanım = güvenlik kaybı</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-orange-400 mt-1">4.</span>
+                            <p><strong>Anahtar gizli tutulmalı:</strong> Sadece gönderen ve alıcı bilmeli</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-orange-900/20 border border-orange-700 rounded-lg p-4">
+                    <p class="text-orange-300">
+                        <strong>⚠️ Önemli:</strong> Bu kurallardan biri bile ihlal edilirse, OTP'nin 
+                        "kırılamaz" özelliği kaybolur! Pratik uygulamalarda anahtar dağıtımı çok zordur.
+                    </p>
+                </div>
+
+                <div class="bg-blue-900/20 border border-blue-700 rounded-lg p-4">
+                    <h3 class="font-semibold text-blue-400 mb-2">🎯 Nasıl Çalışır?</h3>
+                    <p class="text-sm">
+                        OTP, XOR (Exclusive OR) işlemi kullanır. Her mesaj karakteri, karşılık gelen 
+                        anahtar karakteri ile XOR'lanır. Aynı anahtar ile tekrar XOR yapınca orijinal mesaj elde edilir.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- OTP Tool -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 mb-8 border border-gray-700">
+            <h3 class="text-2xl font-bold text-white mb-6">🛠️ OTP Şifreleme Aracı</h3>
+            
+            <!-- Mode Selection -->
+            <div class="flex justify-center mb-6">
+                <div class="bg-gray-900 rounded-lg p-1 inline-flex">
+                    <button id="encryptMode" class="px-6 py-2 rounded-md font-semibold transition bg-orange-500 text-gray-900">
+                        Şifrele
+                    </button>
+                    <button id="decryptMode" class="px-6 py-2 rounded-md font-semibold transition text-gray-400">
+                        Çöz
+                    </button>
+                </div>
+            </div>
+
+            <!-- Encrypt Section -->
+            <div id="encryptSection">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-200 mb-2">Mesajınız</label>
+                        <textarea id="messageInput" rows="4" placeholder="Şifrelenecek mesajı yazın..."
+                            class="w-full p-4 bg-gray-900 border-2 border-gray-700 rounded-lg focus:outline-none focus:border-orange-500 transition resize-none"></textarea>
+                        <div class="text-sm text-gray-400 mt-1">
+                            Mesaj uzunluğu: <span id="messageLength">0</span> karakter
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-lg font-semibold text-gray-200">Anahtar (Key)</label>
+                            <button id="generateKey" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                                🎲 Rastgele Oluştur
+                            </button>
+                        </div>
+                        <textarea id="keyInput" rows="4" placeholder="Anahtar buraya yazılacak veya elle girebilirsiniz..."
+                            class="w-full p-4 bg-gray-900 border-2 border-gray-700 rounded-lg focus:outline-none focus:border-orange-500 transition resize-none font-mono"></textarea>
+                        <div class="text-sm text-gray-400 mt-1">
+                            Anahtar uzunluğu: <span id="keyLength">0</span> karakter
+                        </div>
+                    </div>
+
+                    <button id="encryptBtn" class="w-full bg-orange-500 hover:bg-orange-600 text-gray-900 font-bold py-3 rounded-lg transition">
+                        Şifrele
+                    </button>
+
+                    <div id="encryptedOutput" class="hidden">
+                        <label class="block text-lg font-semibold text-gray-200 mb-2">Şifreli Mesaj (Hex)</label>
+                        <div class="bg-gray-900 border-2 border-orange-600 rounded-lg p-4 font-mono text-orange-400 break-all">
+                            <div id="encryptedText"></div>
+                        </div>
+                        <button onclick="copyToClipboard('encryptedText')" class="mt-2 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition">
+                            Kopyala
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decrypt Section -->
+            <div id="decryptSection" class="hidden">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-200 mb-2">Şifreli Mesaj (Hex)</label>
+                        <textarea id="encryptedInput" rows="4" placeholder="Hex formatında şifreli mesajı yapıştırın..."
+                            class="w-full p-4 bg-gray-900 border-2 border-gray-700 rounded-lg focus:outline-none focus:border-orange-500 transition resize-none font-mono"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-200 mb-2">Anahtar (Key)</label>
+                        <textarea id="decryptKeyInput" rows="4" placeholder="Şifreleme sırasında kullanılan anahtarı girin..."
+                            class="w-full p-4 bg-gray-900 border-2 border-gray-700 rounded-lg focus:outline-none focus:border-orange-500 transition resize-none font-mono"></textarea>
+                    </div>
+
+                    <button id="decryptBtn" class="w-full bg-orange-500 hover:bg-orange-600 text-gray-900 font-bold py-3 rounded-lg transition">
+                        Şifreyi Çöz
+                    </button>
+
+                    <div id="decryptedOutput" class="hidden">
+                        <label class="block text-lg font-semibold text-gray-200 mb-2">Çözülmüş Mesaj</label>
+                        <div class="bg-gray-900 border-2 border-green-600 rounded-lg p-4 text-green-400">
+                            <div id="decryptedText"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback" class="mt-4 hidden"></div>
+        </section>
+
+        <!-- Example -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 mb-8 border border-gray-700">
+            <h3 class="text-2xl font-bold text-white mb-4">💡 Örnek Kullanım</h3>
+            <div class="bg-gray-900 rounded-lg p-4 space-y-3 text-sm">
+                <div>
+                    <span class="text-gray-400">Mesaj:</span>
+                    <span class="text-white ml-2 font-mono">HELLO</span>
+                </div>
+                <div>
+                    <span class="text-gray-400">Anahtar:</span>
+                    <span class="text-orange-400 ml-2 font-mono">XMCKL</span>
+                </div>
+                <div class="border-t border-gray-700 pt-2">
+                    <div class="mb-2 text-gray-400">XOR İşlemi (Her karakter için):</div>
+                    <div class="font-mono text-xs space-y-1 text-gray-300">
+                        <div>H (72) XOR X (88) = 16 → 10</div>
+                        <div>E (69) XOR M (77) = 8 → 08</div>
+                        <div>L (76) XOR C (67) = 11 → 0B</div>
+                        <div>L (76) XOR K (75) = 3 → 03</div>
+                        <div>O (79) XOR L (76) = 7 → 07</div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-700 pt-2">
+                    <span class="text-gray-400">Şifreli (Hex):</span>
+                    <span class="text-orange-400 ml-2 font-mono">10080B0307</span>
+                </div>
+            </div>
+            <button onclick="loadExample()" class="mt-4 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm transition">
+                Bu Örneği Yükle
+            </button>
+        </section>
+
+        <!-- Security Warning -->
+        <section class="bg-red-900/20 border border-red-700 rounded-xl p-6 md:p-8">
+            <h3 class="text-2xl font-bold text-red-400 mb-4">⚠️ Güvenlik Uyarıları</h3>
+            <div class="space-y-3 text-gray-300">
+                <div class="flex items-start gap-3">
+                    <span class="text-red-400 text-xl">❌</span>
+                    <p><strong>Anahtarı Tekrar Kullanmayın:</strong> Aynı anahtarı iki farklı mesaj için kullanırsanız, 
+                    kriptanaliz yapılarak her iki mesaj da çözülebilir!</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="text-red-400 text-xl">❌</span>
+                    <p><strong>Tahmin Edilebilir Anahtar Kullanmayın:</strong> "12345" veya "aaaaa" gibi 
+                    anahtarlar güvenli değildir. Gerçek rastgele veriler kullanın.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="text-red-400 text-xl">❌</span>
+                    <p><strong>Kısa Anahtar Kullanmayın:</strong> Anahtar mutlaka mesaj kadar uzun olmalıdır.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="text-green-400 text-xl">✅</span>
+                    <p><strong>Eğitim Amaçlı:</strong> Bu araç eğitim amaçlıdır. Gerçek gizli iletişim için 
+                    modern standart algoritmaları (AES, RSA) kullanın.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        let mode = 'encrypt';
+
+        // Mode switching
+        document.getElementById('encryptMode').addEventListener('click', () => {
+            mode = 'encrypt';
+            document.getElementById('encryptMode').classList.add('bg-orange-500', 'text-gray-900');
+            document.getElementById('encryptMode').classList.remove('text-gray-400');
+            document.getElementById('decryptMode').classList.remove('bg-orange-500', 'text-gray-900');
+            document.getElementById('decryptMode').classList.add('text-gray-400');
+            document.getElementById('encryptSection').classList.remove('hidden');
+            document.getElementById('decryptSection').classList.add('hidden');
+        });
+
+        document.getElementById('decryptMode').addEventListener('click', () => {
+            mode = 'decrypt';
+            document.getElementById('decryptMode').classList.add('bg-orange-500', 'text-gray-900');
+            document.getElementById('decryptMode').classList.remove('text-gray-400');
+            document.getElementById('encryptMode').classList.remove('bg-orange-500', 'text-gray-900');
+            document.getElementById('encryptMode').classList.add('text-gray-400');
+            document.getElementById('decryptSection').classList.remove('hidden');
+            document.getElementById('encryptSection').classList.add('hidden');
+        });
+
+        // Update lengths
+        document.getElementById('messageInput').addEventListener('input', (e) => {
+            document.getElementById('messageLength').textContent = e.target.value.length;
+        });
+
+        document.getElementById('keyInput').addEventListener('input', (e) => {
+            document.getElementById('keyLength').textContent = e.target.value.length;
+        });
+
+        // Generate random key
+        document.getElementById('generateKey').addEventListener('click', () => {
+            const messageLength = document.getElementById('messageInput').value.length;
+            if (messageLength === 0) {
+                showFeedback('Önce bir mesaj yazın!', 'error');
+                return;
+            }
+            
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            let key = '';
+            for (let i = 0; i < messageLength; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('keyInput').value = key;
+            document.getElementById('keyLength').textContent = key.length;
+        });
+
+        // Encrypt
+        document.getElementById('encryptBtn').addEventListener('click', () => {
+            const message = document.getElementById('messageInput').value;
+            const key = document.getElementById('keyInput').value;
+
+            if (!message || !key) {
+                showFeedback('Lütfen hem mesaj hem de anahtar girin!', 'error');
+                return;
+            }
+
+            if (message.length !== key.length) {
+                showFeedback(`Uyarı: Anahtar uzunluğu (${key.length}) mesaj uzunluğu (${message.length}) ile eşit değil! OTP kuralları ihlal ediliyor.`, 'warning');
+            }
+
+            const encrypted = xorEncrypt(message, key);
+            document.getElementById('encryptedText').textContent = encrypted;
+            document.getElementById('encryptedOutput').classList.remove('hidden');
+            showFeedback('Mesaj başarıyla şifrelendi!', 'success');
+        });
+
+        // Decrypt
+        document.getElementById('decryptBtn').addEventListener('click', () => {
+            const encrypted = document.getElementById('encryptedInput').value.trim();
+            const key = document.getElementById('decryptKeyInput').value;
+
+            if (!encrypted || !key) {
+                showFeedback('Lütfen hem şifreli mesaj hem de anahtar girin!', 'error');
+                return;
+            }
+
+            try {
+                const decrypted = xorDecrypt(encrypted, key);
+                document.getElementById('decryptedText').textContent = decrypted;
+                document.getElementById('decryptedOutput').classList.remove('hidden');
+                showFeedback('Mesaj başarıyla çözüldü!', 'success');
+            } catch (error) {
+                showFeedback('Hata: Geçersiz şifreli mesaj formatı!', 'error');
+            }
+        });
+
+        function xorEncrypt(message, key) {
+            let result = '';
+            for (let i = 0; i < message.length; i++) {
+                const messageChar = message.charCodeAt(i);
+                const keyChar = key.charCodeAt(i % key.length);
+                const encrypted = messageChar ^ keyChar;
+                result += encrypted.toString(16).padStart(2, '0');
+            }
+            return result.toUpperCase();
+        }
+
+        function xorDecrypt(encryptedHex, key) {
+            let result = '';
+            for (let i = 0; i < encryptedHex.length; i += 2) {
+                const encryptedByte = parseInt(encryptedHex.substr(i, 2), 16);
+                const keyChar = key.charCodeAt((i / 2) % key.length);
+                const decrypted = encryptedByte ^ keyChar;
+                result += String.fromCharCode(decrypted);
+            }
+            return result;
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('hidden');
+            
+            if (type === 'success') {
+                feedback.className = 'mt-4 bg-green-900 border border-green-500 text-green-200 p-4 rounded-lg';
+            } else if (type === 'error') {
+                feedback.className = 'mt-4 bg-red-900 border border-red-500 text-red-200 p-4 rounded-lg';
+            } else if (type === 'warning') {
+                feedback.className = 'mt-4 bg-yellow-900 border border-yellow-500 text-yellow-200 p-4 rounded-lg';
+            }
+            
+            feedback.textContent = message;
+        }
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showFeedback('Panoya kopyalandı!', 'success');
+            });
+        }
+
+        function loadExample() {
+            document.getElementById('messageInput').value = 'HELLO';
+            document.getElementById('keyInput').value = 'XMCKL';
+            document.getElementById('messageLength').textContent = '5';
+            document.getElementById('keyLength').textContent = '5';
+            showFeedback('Örnek yüklendi! Şimdi "Şifrele" butonuna tıklayın.', 'success');
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganografi Atölyesi - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .tab-content { display: none; animation: fadeIn 0.5s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            color: white;
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+        }
+        .tab-btn:hover:not(.active) {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        input[type="file"] { display: none; }
+        .custom-file-upload {
+            border: 1px solid #4a5568; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.5rem;
+            padding: 8px 16px; 
+            cursor: pointer; 
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            color: white;
+            border-radius: 0.5rem; 
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .custom-file-upload:hover { 
+            background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .canvas-container {
+            border: 2px dashed #4a5568; 
+            border-radius: 0.75rem; 
+            min-height: 200px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 100%);
+            padding: 1rem;
+        }
+        .canvas-container img, .canvas-container canvas {
+            max-width: 100%; 
+            max-height: 250px; 
+            object-fit: contain; 
+            border-radius: 0.5rem;
+        }
+        .loader {
+            border: 4px solid #f3f3f3; 
+            border-top: 4px solid #3b82f6; 
+            border-radius: 50%;
+            width: 24px; 
+            height: 24px; 
+            animation: spin 1s linear infinite; 
+            display: none;
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        details > summary { 
+            list-style: none; 
+            cursor: pointer;
+        }
+        details > summary::-webkit-details-marker { display: none; }
+        details summary .arrow { 
+            transition: transform 0.2s; 
+            display: inline-block; 
+        }
+        details[open] summary .arrow { transform: rotate(90deg); }
+        pre {
+            background-color: #1e293b; 
+            color: #e2e8f0; 
+            padding: 1rem;
+            border-radius: 0.5rem; 
+            overflow-x: auto; 
+            font-size: 0.875rem;
+        }
+        .result-container {
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+            max-width: 100%;
+        }
+        
+        .text-output {
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .tab-btn {
+                font-size: 0.7rem;
+                padding: 0.5rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-[#0f172a] to-black text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800/80 backdrop-blur-xl border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                    
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="w-full max-w-7xl mx-auto bg-gray-800/40 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-2xl p-3 md:p-6 lg:p-8 my-4">
+        <header class="text-center mb-6 md:mb-8">
+            <h1 class="text-2xl md:text-4xl font-bold text-white tracking-tight mb-2">Steganografi Teknikleri</h1>
+            <p class="text-gray-400 mt-2 text-sm md:text-base">Gelişmiş tekniklerle verileri gizleyin ve ortaya çıkarın</p>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <div class="flex flex-wrap justify-center border-b border-gray-700/50 mb-4 md:mb-6 gap-1">
+            <button class="tab-btn active text-xs md:text-sm font-medium py-2 md:py-3 px-2 md:px-4 rounded-t-lg text-gray-400" onclick="openTab(event, 'imageSteg')">
+                <span class="hidden sm:inline">📝 </span>Metin → Resim
+            </button>
+            <button class="tab-btn text-xs md:text-sm font-medium py-2 md:py-3 px-2 md:px-4 rounded-t-lg text-gray-400" onclick="openTab(event, 'imageInImage')">
+                <span class="hidden sm:inline">🖼️ </span>Resim → Resim
+            </button>
+            <button class="tab-btn text-xs md:text-sm font-medium py-2 md:py-3 px-2 md:px-4 rounded-t-lg text-gray-400" onclick="openTab(event, 'whitespaceSteg')">
+                <span class="hidden sm:inline">⌨️ </span>Boşluk
+            </button>
+            <button class="tab-btn text-xs md:text-sm font-medium py-2 md:py-3 px-2 md:px-4 rounded-t-lg text-gray-400" onclick="openTab(event, 'zerowidthSteg')">
+                <span class="hidden sm:inline">👻 </span>Sıfır Gen.
+            </button>
+            <button class="tab-btn text-xs md:text-sm font-medium py-2 md:py-3 px-2 md:px-4 rounded-t-lg text-gray-400" onclick="openTab(event, 'baconianSteg')">
+                <span class="hidden sm:inline">🔤 </span>Baconian
+            </button>
+            <button class="tab-btn text-xs md:text-sm font-medium py-2 md:py-3 px-2 md:px-4 rounded-t-lg text-gray-400" onclick="openTab(event, 'nullSteg')">
+                <span class="hidden sm:inline">📄 </span>N. Kelime
+            </button>
+            <button class="tab-btn text-xs md:text-sm font-medium py-2 md:py-3 px-2 md:px-4 rounded-t-lg text-gray-400" onclick="openTab(event, 'metadataSteg')">
+                <span class="hidden sm:inline">🏷️ </span>Metadata
+            </button>
+            <button class="tab-btn text-xs md:text-sm font-medium py-2 md:py-3 px-2 md:px-4 rounded-t-lg text-gray-400" onclick="openTab(event, 'audioSteg')">
+                <span class="hidden sm:inline">🎵 </span>Ses
+            </button>
+        </div>
+        
+        <!-- Content sections will be populated by the script -->
+        <div id="imageSteg" class="tab-content active"></div>
+        <div id="imageInImage" class="tab-content"></div>
+        <div id="whitespaceSteg" class="tab-content"></div>
+        <div id="zerowidthSteg" class="tab-content"></div>
+        <div id="baconianSteg" class="tab-content"></div>
+        <div id="nullSteg" class="tab-content"></div>
+        <div id="metadataSteg" class="tab-content"></div>
+        <div id="audioSteg" class="tab-content"></div>
+        
+        <div id="toast" class="fixed bottom-5 right-5 bg-blue-500 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 transform translate-y-5 transition-all duration-300"></div>
+    </div>
+
+<script>
+// --- TEMPLATES FOR EACH TAB ---
+const templates = {
+    imageSteg: `
+        <p class="text-center text-gray-400 mb-6 text-sm">Bir resim dosyasının piksellerine metin verisi gizler (Least Significant Bit yöntemi).</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesaj Gizle</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="img-encode-upload" class="custom-file-upload">Resim Seç</label>
+                        <input type="file" id="img-encode-upload" accept="image/png, image/jpeg"><span id="img-encode-filename" class="ml-3 text-gray-400 text-sm"></span>
+                    </div>
+                    <textarea id="img-encode-message" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2" placeholder="Gizlenecek mesaj..."></textarea>
+                    <button id="img-encode-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md flex justify-center items-center gap-2"><div class="loader" id="img-encode-loader"></div><span>Gizle ve İndir</span></button>
+                    <canvas id="img-encode-canvas" class="hidden"></canvas>
+                </div>
+            </div>
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesajı Çöz</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="img-decode-upload" class="custom-file-upload">Resim Seç</label>
+                        <input type="file" id="img-decode-upload" accept="image/png, image/jpeg"><span id="img-decode-filename" class="ml-3 text-gray-400 text-sm"></span>
+                    </div>
+                    <button id="img-decode-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex justify-center items-center gap-2"><div class="loader" id="img-decode-loader"></div><span>Çöz</span></button>
+                    <p id="img-decode-result" class="w-full min-h-[5rem] bg-gray-800 border border-gray-600 rounded-md p-2 text-gray-300 result-container"></p>
+                    <canvas id="img-decode-canvas" class="hidden"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8">
+            <details class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                <summary class="font-semibold text-lg text-white flex justify-between items-center">
+                    <span>Meraklılar İçin: Metin Resme Nasıl Gizlenir?</span>
+                    <span class="arrow text-2xl">›</span>
+                </summary>
+                <div class="mt-4 text-gray-400 space-y-2">
+                    <p>Bu teknik, bir rengin insan gözünün fark edemeyeceği kadar küçük parçalara ayrılmasına dayanır. Her pikselin Kırmızı, Yeşil ve Mavi (RGB) renk değerleri vardır (0-255 arası). Mesajımız, önce 0 ve 1'lerden oluşan ikili (binary) koda çevrilir. Sonra, resmin her bir renk değerinin en sağdaki, yani en anlamsız biti (Least Significant Bit - LSB) mesajın bir biti ile değiştirilir. Örneğin, 255 (11111111) olan bir renk değeri, mesaj biti '0' ise 254'e (11111110) dönüşür. Bu değişiklik o kadar küçüktür ki, resmin görünümü değişmez.</p>
+                    <pre><code class="language-js">// Temel LSB Gizleme Prensibi
+let originalColor = 255; // Binary: 11111111
+let messageBit = 0;
+// Rengin son bitini temizle (& 254) ve mesaj bitini ekle (| 0)
+let newColor = (originalColor & 254) | messageBit; // Sonuç: 254 (11111110)</code></pre>
+                </div>
+            </details>
+        </div>`,
+    imageInImage: `
+        <p class="text-center text-gray-400 mb-6 text-sm">Bir resmin içine başka bir resmi, piksellerin en anlamsız bitlerini (LSB) kullanarak gizler.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Resim Gizle</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="imginimg-cover-upload" class="custom-file-upload">Kapak Resmini Seç</label>
+                        <input type="file" id="imginimg-cover-upload" accept="image/png, image/jpeg"><span id="imginimg-cover-filename" class="ml-3 text-gray-400 text-sm"></span>
+                    </div>
+                     <div>
+                        <label for="imginimg-secret-upload" class="custom-file-upload">Gizli Resmi Seç</label>
+                        <input type="file" id="imginimg-secret-upload" accept="image/png, image/jpeg"><span id="imginimg-secret-filename" class="ml-3 text-gray-400 text-sm"></span>
+                    </div>
+                    <button id="imginimg-encode-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md flex justify-center items-center gap-2"><div class="loader" id="imginimg-encode-loader"></div><span>Gizle ve İndir</span></button>
+                    <div class="canvas-container mt-4"><canvas id="imginimg-encode-canvas"></canvas></div>
+                </div>
+            </div>
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Resmi Çöz</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="imginimg-decode-upload" class="custom-file-upload">Gizlenmiş Resmi Seç</label>
+                        <input type="file" id="imginimg-decode-upload" accept="image/png, image/jpeg"><span id="imginimg-decode-filename" class="ml-3 text-gray-400 text-sm"></span>
+                    </div>
+                    <button id="imginimg-decode-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex justify-center items-center gap-2"><div class="loader" id="imginimg-decode-loader"></div><span>Çöz</span></button>
+                    <div class="canvas-container mt-4"><canvas id="imginimg-decode-canvas"></canvas></div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8">
+             <details class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                <summary class="font-semibold text-lg text-white flex justify-between items-center"><span>Meraklılar İçin: Resim Resme Nasıl Gizlenir?</span><span class="arrow text-2xl">›</span></summary>
+                <div class="mt-4 text-gray-400 space-y-2">
+                    <p>Bu yöntemde, bir renk değerini oluşturan 8 bitten 4'ü kapak resminden, 4'ü ise gizli resimden alınır. Genellikle, bir rengin en anlamlı 4 biti (MSB) görünümü büyük ölçüde belirlerken, en anlamsız 4 biti (LSB) detayı belirler. Kapak resminin en anlamlı 4 bitini alıp, gizli resmin en anlamlı 4 bitini de en anlamsız 4 bit olacak şekilde ekleyerek yeni bir renk oluştururuz. Sonuçta ortaya çıkan resim büyük ölçüde kapak resmine benzer ama içinde gizli resmin bilgilerini barındırır.</p>
+                    <pre><code class="language-js">// Temel Resim-içinde-Resim Prensibi
+let coverColor = 180;   // Binary: 10110100
+let secretColor = 90;   // Binary: 01011010
+
+// Kapak renginin ilk 4 bitini al: 10110000 (176)
+let coverPart = coverColor & 240; // 240 = 11110000
+// Gizli rengin ilk 4 bitini al ve sağa kaydır: 00000101 (5)
+let secretPart = (secretColor & 240) >> 4;
+
+// İki parçayı birleştir
+let newColor = coverPart | secretPart; // 10110101 (181)</code></pre>
+                </div>
+            </details>
+        </div>`,
+    whitespaceSteg: `
+        <p class="text-center text-gray-400 mb-6 text-sm">Bir metnin kelimeleri arasına normal boşluk ve sekme (tab) karakterleri ekleyerek mesaj gizler.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesaj Gizle</h3>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Lorem Ipsum Üretici</label>
+                    <div class="flex gap-2">
+                         <input type="number" id="lorem-words" value="50" class="w-full bg-gray-800 border border-gray-600 rounded-md p-2"><button id="generate-lorem-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Oluştur</button>
+                    </div>
+                </div>
+                <textarea id="ws-encode-cover" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4" placeholder="Görünür (kapak) metin..."></textarea>
+                <textarea id="ws-encode-secret" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4" placeholder="Gizli mesaj..."></textarea>
+                <button id="ws-encode-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Gizle</button>
+            </div>
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesajı Çöz</h3>
+                <textarea id="ws-decode-stego" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4" placeholder="Gizli mesaj içeren metin..."></textarea>
+                <button id="ws-decode-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Çöz</button>
+                <p id="ws-decode-result" class="mt-4 w-full min-h-[5rem] bg-gray-800 border border-gray-600 rounded-md p-2 text-gray-300 result-container"></p>
+            </div>
+        </div>
+         <div class="mt-4 bg-gray-900/50 border border-gray-700 p-4 rounded-lg">
+            <h4 class="font-semibold text-white">Oluşturulan Metin:</h4>
+            <textarea id="ws-encode-result" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mt-2 text-output" readonly></textarea>
+            <button onclick="copyToClipboard('ws-encode-result')" class="mt-2 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md text-sm">Kopyala</button>
+        </div>
+        <div class="mt-8">
+             <details class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                <summary class="font-semibold text-lg text-white flex justify-between items-center"><span>Meraklılar İçin: Boşluk Karakterleriyle Nasıl Mesaj Gizlenir?</span><span class="arrow text-2xl">›</span></summary>
+                <div class="mt-4 text-gray-400 space-y-2">
+                    <p>Bu teknikte, normalde aynı görünen ama bilgisayar için farklı olan karakterler kullanılır: normal boşluk (' ') ve sekme ('\t'). Gizli mesajın binary kodundaki her '0' için bir boşluk, her '1' için ise bir sekme karakteri, kapak metninin kelimeleri arasına eklenir. Okuyan kişi sadece normal boşluklar görürken, program bu gizli boşluk/sekme dizisini okuyup orijinal mesaja çevirebilir.</p>
+                    <pre><code class="language-js">// "A" harfi (binary: 01000001) nasıl gizlenir:
+let kapak = "Bu bir deneme metnidir.";
+// Çıktı: "Bu  bir    deneme  metnidir."
+// (Buradaki bazı boşluklar aslında sekme karakteridir)</code></pre>
+                </div>
+            </details>
+        </div>`,
+    zerowidthSteg: `
+        <p class="text-center text-gray-400 mb-6 text-sm">Görünmez Unicode karakterleri (sıfır genişlikli) kullanarak metin içine veri saklar.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+             <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesaj Gizle</h3>
+                <textarea id="zw-encode-cover" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4" placeholder="Görünür (kapak) metin..."></textarea>
+                <textarea id="zw-encode-secret" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4" placeholder="Gizli mesaj..."></textarea>
+                <button id="zw-encode-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Gizle</button>
+            </div>
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesajı Çöz</h3>
+                <textarea id="zw-decode-stego" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4" placeholder="Gizli mesaj içeren metin..."></textarea>
+                <button id="zw-decode-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Çöz</button>
+                <p id="zw-decode-result" class="mt-4 w-full min-h-[5rem] bg-gray-800 border border-gray-600 rounded-md p-2 text-gray-300 result-container"></p>
+            </div>
+        </div>
+        <div class="mt-4 bg-gray-900/50 border border-gray-700 p-4 rounded-lg">
+            <h4 class="font-semibold text-white">Oluşturulan Metin:</h4>
+            <textarea id="zw-encode-result" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mt-2 text-output" readonly></textarea>
+            <button onclick="copyToClipboard('zw-encode-result')" class="mt-2 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md text-sm">Kopyala</button>
+        </div>
+        <div class="mt-8">
+             <details class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                <summary class="font-semibold text-lg text-white flex justify-between items-center"><span>Meraklılar İçin: Sıfır Genişlikli Karakterler Nedir?</span><span class="arrow text-2xl">›</span></summary>
+                <div class="mt-4 text-gray-400 space-y-2">
+                    <p>Unicode standardında, metin içinde yer kaplamayan ama var olan özel karakterler bulunur. Örneğin 'Sıfır Genişlikli Boşluk' (\u200B) ve 'Sıfır Genişlikli Birleştirmez' (\u200C). Bu karakterler ekranda görünmez ve imleci hareket ettirmez. Tıpkı boşluk/sekme yönteminde olduğu gibi, gizli mesajın binary kodundaki '0' ve '1'leri bu görünmez karakterlerle eşleştirip kapak metninin herhangi bir yerine (genellikle harflerin arasına) ekleyerek mesajı gizleyebiliriz.</p>
+                    <pre><code class="language-js">// Gizli '0' ve '1' bitlerini temsil eden karakterler
+const ZW_ZERO = '\\u200B'; // Sıfır Genişlikli Boşluk
+const ZW_ONE = '\\u200C';  // Sıfır Genişlikli Birleştirmez
+
+let metin = "Merhaba";
+// Görünmese de "M" ve "e" arasında artık gizli bilgi var
+let gizliMetin = "M" + ZW_ZERO + ZW_ONE + "erhaba";</code></pre>
+                </div>
+            </details>
+        </div>`,
+    baconianSteg: `
+        <p class="text-center text-gray-400 mb-6 text-sm">Metin stilini (normal/kalın) değiştirerek veri gizler. Çözmek için HTML içeren metni yapıştırın.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesaj Gizle</h3>
+                <textarea id="bacon-encode-cover" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4" placeholder="Görünür (kapak) metin..."></textarea>
+                <textarea id="bacon-encode-secret" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4" placeholder="Gizli mesaj..."></textarea>
+                <button id="bacon-encode-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Gizle</button>
+                <div class="mt-4 bg-gray-800 border border-gray-600 rounded-md p-4">
+                    <h4 class="font-semibold text-white mb-2">Oluşturulan Metin (Görünüm):</h4>
+                    <div id="bacon-encode-preview" class="w-full min-h-[5rem] p-2 bg-gray-700 rounded-md text-output"></div>
+                    <h4 class="font-semibold text-white mb-2 mt-4">HTML Kodu:</h4>
+                    <textarea id="bacon-encode-result" class="w-full h-24 bg-gray-700 border border-gray-500 rounded-md p-2 mt-2 text-output" readonly></textarea>
+                    <button onclick="copyToClipboard('bacon-encode-result')" class="mt-2 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md text-sm">HTML'i Kopyala</button>
+                </div>
+            </div>
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesajı Çöz</h3>
+                <textarea id="bacon-decode-stego" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4 text-output" placeholder="Gizli mesaj içeren HTML metnini yapıştırın..."></textarea>
+                <button id="bacon-decode-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Çöz</button>
+                <p id="bacon-decode-result" class="mt-4 w-full min-h-[5rem] bg-gray-800 border border-gray-600 rounded-md p-2 text-gray-300 result-container"></p>
+            </div>
+        </div>
+        <div class="mt-8">
+             <details class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                <summary class="font-semibold text-lg text-white flex justify-between items-center"><span>Meraklılar İçin: Baconian Şifresi Nasıl Çalışır?</span><span class="arrow text-2xl">›</span></summary>
+                <div class="mt-4 text-gray-400 space-y-2">
+                    <p>Francis Bacon tarafından geliştirilen bu şifrede, alfabenin her harfi 'a' ve 'b' harflerinden oluşan 5 karakterlik bir diziye karşılık gelir (Örn: A -> aaaaa, B -> aaaab). Gizli mesaj bu 'a'/'b' dizisine çevrilir. Ardından, kapak metnindeki her harf, sırasıyla bu dizideki 'a' veya 'b'ye göre biçimlendirilir. Örneğin 'a' için normal, 'b' için ise <b>kalın</b> yazı stili kullanılabilir. Çözerken, metindeki normal harfler 'a', kalın harfler 'b' olarak okunur, 5'li gruplara ayrılır ve orijinal harflere geri çevrilir.</p>
+                    <pre><code class="language-js">// "HI" kelimesini (H: aabba, I: aabbb) gizleyelim
+let kapak = "Merhaba Dünya"; // En az 10 harf gerekli
+// Çıktı: "Merh<b>a</b>b<b>a</b> <b>D</b>ü<b>n</b>y<b>a</b>"
+// Gizli mesaj: aabbaaabbb -> HI</code></pre>
+                </div>
+            </details>
+        </div>`,
+    nullSteg: `
+        <p class="text-center text-gray-400 mb-6 text-sm">Bir metindeki her N. kelimeyi alarak gizli mesajı ortaya çıkarır veya gizli mesaj için özel metin oluşturur.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">N. Kelime Oluşturucu</h3>
+                <textarea id="null-encode-secret" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4" placeholder="Gizlenecek mesaj..."></textarea>
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="null-encode-n-value" class="text-gray-300">Her</label>
+                    <input type="number" id="null-encode-n-value" value="3" class="w-24 bg-gray-800 border border-gray-600 rounded-md p-2">
+                    <label for="null-encode-n-value" class="text-gray-300">. kelimenin ilk harfi olsun.</label>
+                </div>
+                <button id="null-encode-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Metin Oluştur</button>
+                <div id="null-encode-result" class="mt-4 w-full min-h-[5rem] bg-gray-800 border border-gray-600 rounded-md p-2 text-gray-300 result-container"></div>
+            </div>
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">N. Kelime Çözücü</h3>
+                <textarea id="null-decode-stego" class="w-full h-32 bg-gray-800 border border-gray-600 rounded-md p-2 mb-4" placeholder="Metni buraya yapıştırın..."></textarea>
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="null-n-value" class="text-gray-300">Her</label>
+                    <input type="number" id="null-n-value" value="3" class="w-24 bg-gray-800 border border-gray-600 rounded-md p-2">
+                    <label for="null-n-value" class="text-gray-300">. kelimenin ilk harfini al.</label>
+                </div>
+                <button id="null-decode-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Çöz</button>
+                <p id="null-decode-result" class="mt-4 w-full min-h-[5rem] bg-gray-800 border border-gray-600 rounded-md p-2 text-gray-300 result-container"></p>
+            </div>
+        </div>
+        <div class="mt-8">
+             <details class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                <summary class="font-semibold text-lg text-white flex justify-between items-center"><span>Meraklılar İçin: N. Kelime (Null Cipher) Nasıl Çalışır?</span><span class="arrow text-2xl">›</span></summary>
+                <div class="mt-4 text-gray-400 space-y-2">
+                    <p>Bu, en basit steganografi türlerinden biridir ve bir kurala dayanır. Gönderici ve alıcı, bir sayı (N) üzerinde anlaşır.</p>
+                    <p><strong>Oluşturucu:</strong> Gizli mesajın her harfi için, o harfle başlayan kelimeler seçilir ve aralarına dolgu kelimeleri eklenir. N=3 ise, gizli mesajdaki her harf için 2 dolgu kelime + 1 gizli kelime yerleştirilir.</p>
+                    <p><strong>Çözücü:</strong> Metindeki her N'inci kelimenin ilk harfi alınır ve birleştirilir. Örneğin, N=3 ise, 3., 6., 9., ... kelimelerin ilk harfleri gizli mesajı oluşturur.</p>
+                    <pre><code class="language-js">// N=3 için oluşturucu örneği
+let gizliMesaj = "selam";
+// s -> "sat", "e" -> "elma", "l" -> "liman", ...
+// Sonuç: "güzel sat bugün elma yarın liman ..."
+
+// N=3 için çözüm prensibi
+let metin = "güzel sat bugün elma yarın liman kedi";
+let kelimeler = metin.split(' ');
+// 2. kelime: "sat" -> 's'
+// 5. kelime: "elma" -> 'e'
+// 8. kelime: "liman" -> 'l'</code></pre>
+                </div>
+            </details>
+        </div>`,
+    metadataSteg: `
+        <p class="text-center text-gray-400 mb-6 text-sm">PNG ve JPEG dosyalarının metadata'larına metin verisi gizler. Piksellere dokunmadan güvenli saklama.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesaj Gizle</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="meta-encode-upload" class="custom-file-upload">Resim Seç (PNG/JPEG)</label>
+                        <input type="file" id="meta-encode-upload" accept="image/png,image/jpeg,image/jpg"><span id="meta-encode-filename" class="ml-3 text-gray-400 text-sm"></span>
+                    </div>
+                    <textarea id="meta-encode-message" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2" placeholder="Gizlenecek mesaj..."></textarea>
+                    <div class="flex items-center space-x-4">
+                        <label class="text-gray-300 text-sm">Anahtar:</label>
+                        <input type="text" id="meta-encode-key" class="flex-1 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm" placeholder="steganografi" value="steganografi">
+                    </div>
+                    <button id="meta-encode-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md flex justify-center items-center gap-2">
+                        <div class="loader" id="meta-encode-loader"></div>
+                        <span>Metadata'ya Gizle ve İndir</span>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesajı Çöz</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="meta-decode-upload" class="custom-file-upload">Resim Seç (PNG/JPEG)</label>
+                        <input type="file" id="meta-decode-upload" accept="image/png,image/jpeg,image/jpg"><span id="meta-decode-filename" class="ml-3 text-gray-400 text-sm"></span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <label class="text-gray-300 text-sm">Anahtar:</label>
+                        <input type="text" id="meta-decode-key" class="flex-1 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm" placeholder="steganografi" value="steganografi">
+                    </div>
+                    <button id="meta-decode-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex justify-center items-center gap-2">
+                        <div class="loader" id="meta-decode-loader"></div>
+                        <span>Metadata'dan Çöz</span>
+                    </button>
+                    <p id="meta-decode-result" class="w-full min-h-[5rem] bg-gray-800 border border-gray-600 rounded-md p-2 text-gray-300 result-container"></p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8">
+            <div class="bg-gray-900/50 border border-gray-700 p-4 rounded-lg">
+                <h4 class="font-semibold text-white mb-2">Metadata Bilgileri:</h4>
+                <div id="meta-info-display" class="bg-gray-800 p-3 rounded text-sm text-gray-300 max-h-40 overflow-y-auto font-mono">
+                    <p class="text-gray-500">Resim seçildiğinde metadata bilgileri burada görünecek...</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4">
+             <details class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                <summary class="font-semibold text-lg text-white flex justify-between items-center"><span>Meraklılar İçin: Metadata Steganografi Nasıl Çalışır?</span><span class="arrow text-2xl">›</span></summary>
+                <div class="mt-4 text-gray-400 space-y-2">
+                    <p>Bu teknik, hem PNG hem de JPEG dosyalarında çalışır. Gizli mesaj, özel işaretleyiciler (marker) ile birlikte dosyanın sonuna eklenir. Bu yöntem basit ama etkilidir çünkü çoğu görüntü görüntüleyici, dosyanın sonundaki ekstra veriyi görmezden gelir.</p>
+                    <p><strong>Avantajları:</strong> Piksel verilerine hiç dokunmaz, görsel kalite korunur. Dosya boyutu çok az artar. Hem PNG hem JPEG formatlarında çalışır.</p>
+                    <p><strong>Güvenlik:</strong> Özel anahtar olmadan mesaj çözülemez. Standart hex editörlerle tespit edilebilir ama günlük kullanımda fark edilmez.</p>
+                    <pre><code class="language-js">// Veri Yapısı
+// [Orijinal Resim] + [STEG_META_START] + [Anahtar] + [0] + [Mesaj] + [STEG_META_END]
+// Örnek: ... + "STEG_META_START" + "gizlikey" + "\0" + "Gizli mesajım" + "STEG_META_END"</code></pre>
+                </div>
+            </details>
+        </div>`,
+    audioSteg: `
+        <p class="text-center text-gray-400 mb-6 text-sm">Metin mesajınızı ses dalgasının içine gizler (LSB yöntemi) ve WAV dosyası oluşturur.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesaj Gizle</h3>
+                <div class="space-y-4">
+                    <textarea id="audio-encode-secret" class="w-full h-24 bg-gray-800 border border-gray-600 rounded-md p-2" placeholder="Gizlenecek mesaj..."></textarea>
+                    <button id="audio-encode-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 flex items-center justify-center gap-2">
+                        <div class="loader" id="audio-encode-loader"></div>
+                        <span>.WAV Oluştur ve İndir</span>
+                    </button>
+                    <p class="text-xs text-gray-500 text-center">Not: Bu işlem mesajın uzunluğuna göre birkaç saniye sürebilir.</p>
+                </div>
+            </div>
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-semibold mb-4 text-white">Mesajı Çöz</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="audio-decode-upload" class="custom-file-upload">WAV Dosyasını Seç</label>
+                        <input type="file" id="audio-decode-upload" accept="audio/wav"><span id="audio-decode-filename" class="ml-3 text-gray-400 text-sm"></span>
+                    </div>
+                    <button id="audio-decode-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex justify-center items-center gap-2">
+                        <div class="loader" id="audio-decode-loader"></div>
+                        <span>Çöz</span>
+                    </button>
+                    <p id="audio-decode-result" class="w-full min-h-[5rem] bg-gray-800 border border-gray-600 rounded-md p-2 text-gray-300 result-container"></p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8">
+             <details class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                <summary class="font-semibold text-lg text-white flex justify-between items-center"><span>Meraklılar İçin: Metin Sese Nasıl Gizlenir?</span><span class="arrow text-2xl">›</span></summary>
+                <div class="mt-4 text-gray-400 space-y-2">
+                    <p>Bu teknik, resimdeki LSB yöntemine çok benzer. Dijital ses, saniyede binlerce kez kaydedilen ses dalgası genliklerinden (sample) oluşur. Her bir sample, bir sayıdır. Tıpkı resim piksellerinde olduğu gibi, bu sayıların da en anlamsız bitini (LSB) gizli mesajımızın bir biti ile değiştirebiliriz. İnsan kulağı, sesteki bu minicik genlik değişimini duyamaz. Bu uygulamada, basit bir sinüs dalgası (saf bir ton) üretilir ve mesajınız bu dalganın sample'larına gizlenerek bir WAV dosyası oluşturulur.</p>
+                    <pre><code class="language-js">// Temel Ses LSB Prensibi
+let originalSample = 15000; // Bir ses örneği değeri
+let messageBit = 1;
+// Sample'ın son bitini temizle ve mesaj bitini ekle
+let newSample = (originalSample & 65534) | messageBit; // Sonuç: 15001</code></pre>
+                </div>
+            </details>
+        </div>`
+};
+
+// --- INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    Object.keys(templates).forEach(key => {
+        const container = document.getElementById(key);
+        if (container) {
+            container.innerHTML = templates[key];
+        }
+    });
+    initializeAllEventListeners();
+});
+
+// --- TAB MANAGEMENT ---
+function openTab(evt, tabName) {
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => content.classList.remove('active'));
+
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(button => button.classList.remove('active'));
+
+    document.getElementById(tabName).classList.add('active');
+    evt.currentTarget.classList.add('active');
+}
+
+// --- HELPER FUNCTIONS ---
+const textToBinary = (text) => text.split('').map(char => char.charCodeAt(0).toString(2).padStart(8, '0')).join('');
+const binaryToText = (binary) => {
+    const chars = [];
+    for (let i = 0; i < binary.length; i += 8) {
+        const byte = binary.substr(i, 8);
+        if (byte.length === 8) {
+            chars.push(String.fromCharCode(parseInt(byte, 2)));
+        }
+    }
+    return chars.join('');
+};
+
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `fixed bottom-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg transition-all duration-300 ${isError ? 'bg-red-500' : 'bg-blue-500'} opacity-100 transform translate-y-0`;
+    setTimeout(() => {
+        toast.className = toast.className.replace('opacity-100 transform translate-y-0', 'opacity-0 transform translate-y-5');
+    }, 2500);
+}
+
+function copyToClipboard(elementId) {
+    const textArea = document.getElementById(elementId);
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        showToast("Metin panoya kopyalandı!");
+    } catch (err) {
+        showToast("Kopyalama başarısız oldu.", true);
+    }
+}
+
+function toggleLoader(loaderId, show) {
+    const loader = document.getElementById(loaderId);
+    if (loader) {
+        loader.style.display = show ? 'block' : 'none';
+    }
+}
+
+const readFileAsImage = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = event.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+});
+
+// --- IMAGE METADATA STEGANOGRAPHY FUNCTIONS ---
+function detectImageType(data) {
+    // PNG signature: 89 50 4E 47
+    if (data.length >= 4 && data[0] === 0x89 && data[1] === 0x50 && data[2] === 0x4E && data[3] === 0x47) {
+        return 'PNG';
+    }
+    // JPEG signature: FF D8
+    if (data.length >= 2 && data[0] === 0xFF && data[1] === 0xD8) {
+        return 'JPEG';
+    }
+    return null;
+}
+
+// Simple method: Embed message at the end of file with marker
+function embedMessageInImage(arrayBuffer, key, message) {
+    const data = new Uint8Array(arrayBuffer);
+    const imageType = detectImageType(data);
+    
+    if (!imageType) {
+        throw new Error('Desteklenmeyen dosya formatı. Sadece PNG ve JPEG desteklenir.');
+    }
+    
+    // Create our custom marker and data
+    const marker = new TextEncoder().encode('STEG_META_START');
+    const keyData = new TextEncoder().encode(key);
+    const messageData = new TextEncoder().encode(message);
+    const endMarker = new TextEncoder().encode('STEG_META_END');
+    const separator = new Uint8Array([0]); // null separator
+    
+    // Calculate total size needed
+    const totalMetaSize = marker.length + keyData.length + separator.length + messageData.length + endMarker.length;
+    
+    // Create new buffer with embedded data
+    const newBuffer = new Uint8Array(data.length + totalMetaSize);
+    newBuffer.set(data, 0); // Original image data
+    
+    let offset = data.length;
+    newBuffer.set(marker, offset);
+    offset += marker.length;
+    newBuffer.set(keyData, offset);
+    offset += keyData.length;
+    newBuffer.set(separator, offset);
+    offset += separator.length;
+    newBuffer.set(messageData, offset);
+    offset += messageData.length;
+    newBuffer.set(endMarker, offset);
+    
+    return newBuffer.buffer;
+}
+
+function extractMessageFromImage(arrayBuffer, key) {
+    const data = new Uint8Array(arrayBuffer);
+    const imageType = detectImageType(data);
+    
+    if (!imageType) {
+        throw new Error('Desteklenmeyen dosya formatı. Sadece PNG ve JPEG desteklenir.');
+    }
+    
+    // Look for our markers
+    const startMarker = new TextEncoder().encode('STEG_META_START');
+    const endMarker = new TextEncoder().encode('STEG_META_END');
+    
+    // Find start marker
+    let startPos = -1;
+    for (let i = 0; i <= data.length - startMarker.length; i++) {
+        let found = true;
+        for (let j = 0; j < startMarker.length; j++) {
+            if (data[i + j] !== startMarker[j]) {
+                found = false;
+                break;
+            }
+        }
+        if (found) {
+            startPos = i;
+            break;
+        }
+    }
+    
+    if (startPos === -1) return null;
+    
+    // Find end marker
+    let endPos = -1;
+    for (let i = startPos + startMarker.length; i <= data.length - endMarker.length; i++) {
+        let found = true;
+        for (let j = 0; j < endMarker.length; j++) {
+            if (data[i + j] !== endMarker[j]) {
+                found = false;
+                break;
+            }
+        }
+        if (found) {
+            endPos = i;
+            break;
+        }
+    }
+    
+    if (endPos === -1) return null;
+    
+    // Extract the embedded data
+    const embeddedData = data.slice(startPos + startMarker.length, endPos);
+    
+    // Find the null separator between key and message
+    const nullIndex = embeddedData.indexOf(0);
+    if (nullIndex === -1) return null;
+    
+    const embeddedKey = new TextDecoder().decode(embeddedData.slice(0, nullIndex));
+    if (embeddedKey !== key) return null;
+    
+    const message = new TextDecoder().decode(embeddedData.slice(nullIndex + 1));
+    return message;
+}
+
+function displayImageMetadata(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const arrayBuffer = e.target.result;
+            const data = new Uint8Array(arrayBuffer);
+            const imageType = detectImageType(data);
+            
+            let metadataHTML = '<div class="space-y-2">';
+            
+            if (!imageType) {
+                metadataHTML += '<p class="text-red-400">Desteklenmeyen dosya formatı.</p>';
+            } else {
+                metadataHTML += `<p><span class="text-blue-400">Dosya Türü:</span> ${imageType}</p>`;
+                metadataHTML += `<p><span class="text-blue-400">Dosya Boyutu:</span> ${(arrayBuffer.byteLength / 1024).toFixed(2)} KB</p>`;
+                
+                // Check for embedded steganography data
+                const startMarker = new TextEncoder().encode('STEG_META_START');
+                let hasStegData = false;
+                
+                for (let i = 0; i <= data.length - startMarker.length; i++) {
+                    let found = true;
+                    for (let j = 0; j < startMarker.length; j++) {
+                        if (data[i + j] !== startMarker[j]) {
+                            found = false;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        hasStegData = true;
+                        break;
+                    }
+                }
+                
+                if (hasStegData) {
+                    metadataHTML += '<p><span class="text-green-400">Steganografi:</span> <span class="text-yellow-400">Bu dosyada gizli veri tespit edildi</span></p>';
+                } else {
+                    metadataHTML += '<p><span class="text-gray-500">Steganografi:</span> Gizli veri bulunamadı</p>';
+                }
+                
+                // For PNG files, also show basic chunk info
+                if (imageType === 'PNG' && data.length >= 8) {
+                    let pos = 8;
+                    const view = new DataView(arrayBuffer);
+                    let chunkCount = 0;
+                    
+                    while (pos < data.length - 12 && chunkCount < 10) {
+                        try {
+                            const chunkLength = view.getUint32(pos, false);
+                            const chunkType = String.fromCharCode(...data.slice(pos + 4, pos + 8));
+                            
+                            if (chunkType === 'IHDR') {
+                                const width = view.getUint32(pos + 8, false);
+                                const height = view.getUint32(pos + 12, false);
+                                metadataHTML += `<p><span class="text-blue-400">Boyut:</span> ${width}x${height}</p>`;
+                            }
+                            
+                            if (chunkType === 'IEND') break;
+                            pos += 12 + chunkLength;
+                            chunkCount++;
+                        } catch (e) {
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            metadataHTML += '</div>';
+            document.getElementById('meta-info-display').innerHTML = metadataHTML;
+            
+        } catch (error) {
+            document.getElementById('meta-info-display').innerHTML = '<p class="text-red-400">Metadata okunamadı: ' + error.message + '</p>';
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// --- CORE LOGIC & EVENT LISTENERS ---
+function initializeAllEventListeners() {
+    // --- LOREM IPSUM GENERATOR ---
+    document.getElementById('generate-lorem-btn')?.addEventListener('click', () => {
+        const wordsCount = parseInt(document.getElementById('lorem-words').value, 10);
+        const lorem = "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum".split(' ');
+        let result = '';
+        for (let i = 0; i < wordsCount; i++) {
+            result += lorem[Math.floor(Math.random() * lorem.length)] + ' ';
+        }
+        document.getElementById('ws-encode-cover').value = result.trim();
+    });
+
+    // --- IMAGE (TEXT IN IMAGE LSB) LISTENERS ---
+    const MESSAGE_TERMINATOR = "11111111000000001111111100000000";
+    document.getElementById('img-encode-upload')?.addEventListener('change', (e) => { document.getElementById('img-encode-filename').textContent = e.target.files[0]?.name || ''; });
+    document.getElementById('img-decode-upload')?.addEventListener('change', (e) => { document.getElementById('img-decode-filename').textContent = e.target.files[0]?.name || ''; });
+
+    document.getElementById('img-encode-btn')?.addEventListener('click', async () => {
+        const file = document.getElementById('img-encode-upload').files[0];
+        const message = document.getElementById('img-encode-message').value;
+        if (!file || !message) return showToast("Lütfen bir resim seçin ve mesaj girin.", true);
+
+        toggleLoader('img-encode-loader', true);
+        try {
+            const img = await readFileAsImage(file);
+            const canvas = document.getElementById('img-encode-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            const binaryMessage = textToBinary(message) + MESSAGE_TERMINATOR;
+            
+            if (binaryMessage.length > data.length * 0.75) {
+                 return showToast("Mesaj, resim için çok uzun!", true);
+            }
+
+            let dataIndex = 0;
+            for (let i = 0; i < binaryMessage.length; i++) {
+                if ((dataIndex + 1) % 4 === 0) dataIndex++;
+                data[dataIndex] = (data[dataIndex] & 0xFE) | parseInt(binaryMessage[i], 2);
+                dataIndex++;
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+            const link = document.createElement('a');
+            link.download = 'gizlenmis-' + file.name.replace(/\.[^/.]+$/, "") + ".png";
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        } catch (error) {
+            showToast("Resim işlenirken hata oluştu.", true);
+        } finally {
+            toggleLoader('img-encode-loader', false);
+        }
+    });
+
+    document.getElementById('img-decode-btn')?.addEventListener('click', async () => {
+        const file = document.getElementById('img-decode-upload').files[0];
+        if (!file) return showToast("Lütfen bir resim seçin.", true);
+
+        toggleLoader('img-decode-loader', true);
+        document.getElementById('img-decode-result').textContent = '';
+        try {
+            const img = await readFileAsImage(file);
+            const canvas = document.getElementById('img-decode-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            let binaryMessage = '';
+
+            for (let i = 0; i < data.length; i++) {
+                 if ((i + 1) % 4 === 0) continue;
+                binaryMessage += (data[i] & 1).toString();
+                if (binaryMessage.length > MESSAGE_TERMINATOR.length*2 && binaryMessage.endsWith(MESSAGE_TERMINATOR)) break;
+            }
+            
+            const terminatorIndex = binaryMessage.lastIndexOf(MESSAGE_TERMINATOR);
+            if (terminatorIndex !== -1) {
+                const extractedBinary = binaryMessage.substring(0, terminatorIndex);
+                document.getElementById('img-decode-result').textContent = binaryToText(extractedBinary);
+            } else {
+                document.getElementById('img-decode-result').textContent = "Gizli mesaj bulunamadı veya resim bozuk.";
+            }
+        } catch (error) {
+            showToast("Resim okunurken hata oluştu.", true);
+        } finally {
+            toggleLoader('img-decode-loader', false);
+        }
+    });
+
+    // --- IMAGE IN IMAGE LISTENERS ---
+    document.getElementById('imginimg-cover-upload')?.addEventListener('change', (e) => { document.getElementById('imginimg-cover-filename').textContent = e.target.files[0]?.name || ''; });
+    document.getElementById('imginimg-secret-upload')?.addEventListener('change', (e) => { document.getElementById('imginimg-secret-filename').textContent = e.target.files[0]?.name || ''; });
+    document.getElementById('imginimg-decode-upload')?.addEventListener('change', (e) => { document.getElementById('imginimg-decode-filename').textContent = e.target.files[0]?.name || ''; });
+
+    document.getElementById('imginimg-encode-btn')?.addEventListener('click', async () => {
+        const coverFile = document.getElementById('imginimg-cover-upload').files[0];
+        const secretFile = document.getElementById('imginimg-secret-upload').files[0];
+        if (!coverFile || !secretFile) return showToast("Lütfen kapak ve gizli resimleri seçin.", true);
+        
+        toggleLoader('imginimg-encode-loader', true);
+        try {
+            const [coverImg, secretImg] = await Promise.all([readFileAsImage(coverFile), readFileAsImage(secretFile)]);
+            const canvas = document.getElementById('imginimg-encode-canvas');
+            const ctx = canvas.getContext('2d');
+            const w = Math.min(coverImg.width, secretImg.width);
+            const h = Math.min(coverImg.height, secretImg.height);
+            canvas.width = w;
+            canvas.height = h;
+
+            ctx.drawImage(coverImg, 0, 0);
+            const coverData = ctx.getImageData(0, 0, w, h).data;
+            ctx.drawImage(secretImg, 0, 0);
+            const secretData = ctx.getImageData(0, 0, w, h).data;
+            
+            const newImageData = ctx.createImageData(w, h);
+
+            for (let i = 0; i < newImageData.data.length; i += 4) {
+                for (let j=0; j<3; j++) { // R, G, B
+                    let coverPart = coverData[i+j] & 0xF0; // 11110000
+                    let secretPart = (secretData[i+j] & 0xF0) >> 4;
+                    newImageData.data[i+j] = coverPart | secretPart;
+                }
+                newImageData.data[i+3] = 255; // Alpha
+            }
+            
+            ctx.putImageData(newImageData, 0, 0);
+            const link = document.createElement('a');
+            link.download = 'resim-icinde-resim.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        } catch (error) {
+            showToast("Resimler işlenirken bir hata oluştu.", true);
+        } finally {
+            toggleLoader('imginimg-encode-loader', false);
+        }
+    });
+    
+    document.getElementById('imginimg-decode-btn')?.addEventListener('click', async () => {
+        const file = document.getElementById('imginimg-decode-upload').files[0];
+        if (!file) return showToast("Lütfen bir resim seçin.", true);
+
+        toggleLoader('imginimg-decode-loader', true);
+        try {
+            const img = await readFileAsImage(file);
+            const canvas = document.getElementById('imginimg-decode-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            ctx.drawImage(img, 0, 0);
+            const stegoData = ctx.getImageData(0, 0, img.width, img.height);
+            const newImageData = ctx.createImageData(img.width, img.height);
+
+            for(let i=0; i<stegoData.data.length; i+=4) {
+                 for (let j=0; j<3; j++) { // R, G, B
+                    let secretPart = (stegoData.data[i+j] & 0x0F) << 4;
+                    newImageData.data[i+j] = secretPart;
+                 }
+                 newImageData.data[i+3] = 255; // Alpha
+            }
+            ctx.putImageData(newImageData, 0, 0);
+        } catch (error) {
+            showToast("Resim çözülürken bir hata oluştu.", true);
+        } finally {
+            toggleLoader('imginimg-decode-loader', false);
+        }
+    });
+
+    // --- WHITESPACE LISTENERS ---
+    const SPACE = ' '; const TAB = '\t';
+    document.getElementById('ws-encode-btn')?.addEventListener('click', () => {
+        const coverText = document.getElementById('ws-encode-cover').value;
+        const secretMessage = document.getElementById('ws-encode-secret').value;
+        const binaryMessage = textToBinary(secretMessage);
+        const words = coverText.split(' ');
+        if (words.length - 1 < binaryMessage.length) return showToast("Kapak metni, gizli mesaj için yeterince uzun değil.", true);
+        
+        let result = words[0];
+        for (let i = 0; i < binaryMessage.length; i++) {
+            result += (binaryMessage[i] === '0' ? SPACE : TAB) + words[i+1];
+        }
+        result += ' ' + words.slice(binaryMessage.length + 1).join(' ');
+        document.getElementById('ws-encode-result').value = result;
+    });
+    document.getElementById('ws-decode-btn')?.addEventListener('click', () => {
+        const stegoText = document.getElementById('ws-decode-stego').value;
+        const binaryMessage = stegoText.split('').map(char => (char === SPACE) ? '0' : (char === TAB) ? '1' : '').join('');
+        document.getElementById('ws-decode-result').textContent = binaryToText(binaryMessage);
+    });
+    
+    // --- ZERO-WIDTH LISTENERS ---
+    const ZW_ZERO = '\u200B'; const ZW_ONE = '\u200C';
+    document.getElementById('zw-encode-btn')?.addEventListener('click', () => {
+        const coverText = document.getElementById('zw-encode-cover').value;
+        const secretMessage = document.getElementById('zw-encode-secret').value;
+        const binaryMessage = textToBinary(secretMessage);
+        const zeroWidthChars = binaryMessage.split('').map(bit => bit === '0' ? ZW_ZERO : ZW_ONE).join('');
+        document.getElementById('zw-encode-result').value = coverText.slice(0, 1) + zeroWidthChars + coverText.slice(1);
+    });
+    document.getElementById('zw-decode-btn')?.addEventListener('click', () => {
+        const stegoText = document.getElementById('zw-decode-stego').value;
+        const binaryMessage = stegoText.split('').map(char => (char === ZW_ZERO) ? '0' : (char === ZW_ONE) ? '1' : '').join('');
+        document.getElementById('zw-decode-result').textContent = binaryToText(binaryMessage);
+    });
+    
+    // --- BACONIAN LISTENERS ---
+    const baconianMap = { 'a': 'aaaaa', 'b': 'aaaab', 'c': 'aaaba', 'd': 'aaabb', 'e': 'aabaa', 'f': 'aabab', 'g': 'aabba', 'h': 'aabbb', 'i': 'abaaa', 'j': 'abaab', 'k': 'ababa', 'l': 'ababb', 'm': 'abbaa', 'n': 'abbab', 'o': 'abbba', 'p': 'abbbb', 'q': 'baaaa', 'r': 'baaab', 's': 'baaba', 't': 'baabb', 'u': 'babaa', 'v': 'babab', 'w': 'babba', 'x': 'babbb', 'y': 'bbaaa', 'z': 'bbaab', ' ': 'bbaba' };
+    const reverseBaconianMap = Object.fromEntries(Object.entries(baconianMap).map(([k, v]) => [v, k]));
+    document.getElementById('bacon-encode-btn')?.addEventListener('click', () => {
+        const coverText = document.getElementById('bacon-encode-cover').value.replace(/[^a-zA-Z]/g, '');
+        const secretMessage = document.getElementById('bacon-encode-secret').value.toLowerCase();
+        let baconSequence = '';
+        for (const char of secretMessage) {
+            if (baconianMap[char]) baconSequence += baconianMap[char];
+        }
+        if (coverText.length < baconSequence.length) return showToast("Kapak metni, gizli mesaj için yeterince uzun değil.", true);
+        
+        let resultHTML = '';
+        for (let i = 0; i < coverText.length; i++) {
+            if (i < baconSequence.length) {
+                resultHTML += (baconSequence[i] === 'a') ? coverText[i] : `<b>${coverText[i]}</b>`;
+            } else {
+                resultHTML += coverText[i];
+            }
+        }
+        document.getElementById('bacon-encode-preview').innerHTML = resultHTML;
+        document.getElementById('bacon-encode-result').value = resultHTML;
+    });
+    document.getElementById('bacon-decode-btn')?.addEventListener('click', () => {
+        const stegoHTML = document.getElementById('bacon-decode-stego').value;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = stegoHTML;
+        let baconSequence = '';
+        Array.from(tempDiv.childNodes).forEach(node => {
+            if(node.nodeType === 3) baconSequence += 'a'.repeat(node.textContent.replace(/[^a-zA-Z]/g, '').length); // Text node
+            if(node.nodeType === 1 && node.tagName === 'B') baconSequence += 'b'.repeat(node.textContent.replace(/[^a-zA-Z]/g, '').length); // Bold tag
+        });
+        
+        let decodedMessage = '';
+        for (let i = 0; i < baconSequence.length; i += 5) {
+            const chunk = baconSequence.substr(i, 5);
+            if (reverseBaconianMap[chunk]) decodedMessage += reverseBaconianMap[chunk];
+        }
+        document.getElementById('bacon-decode-result').textContent = decodedMessage;
+    });
+    
+    // --- NULL CIPHER LISTENERS ---
+    // Turkish words for steganography - loaded from trKelime.csv data
+    const turkishWords = [
+        'otelin', 'kalem', 'saat', 'arabası', 'sabunluk', 'acente', 'acilen', 'sadece', 'adet', 'Afrika', 
+        'fotoğraflı', 'sahibi', 'askeri', 'askılık', 'akıllı', 'aksiyon', 'asla', 'alakalı', 'alana', 
+        'alabiliyoruz', 'alıcı', 'salıncak', 'almaktayım', 'alto', 'ama', 'Amerika', 'amir', 'alan', 
+        'ancak', 'animasyon', 'ankastre', 'anlatım', 'sandalye', 'sandalyesi', 'antika', 'anten', 'arap', 
+        'araba', 'araç', 'arası', 'arzum', 'aşağıda', 'aslında', 'saattir', 'saati', 'saatinde', 'satış', 
+        'ava', 'ayakkabı', 'aynı', 'babet', 'abacı', 'abajur', 'anahtarlık', 'abaküs', 'abaküslü', 
+        'abaküsü', 'abalı', 'balon', 'asansörlü', 'aparatı', 'bardağı', 'abartı', 'abartılacak', 'abartılı', 
+        'abartılmış', 'abartısız', 'abartmış', 'abasındaki', 'abdest', 'abdesti', 'abdestim', 'abdestimi', 
+        'abdestini', 'abdestinizi', 'abdestlerini', 'abdestli', 'abdi', 'Abdullah', 'abes', 'abesti', 
+        'haber', 'abiye', 'abis', 'abiyeler', 'abi', 'abide', 'abiden', 'abidir', 'abiler', 'abileri', 
+        'abilerime', 'abilerimi', 'abilerimiz', 'abili', 'abilik', 'abim', 'abimde', 'abimden', 'abimdi', 
+        'abimdir', 'abime', 'abimi', 'abimin', 'abimiz', 'abimizdi', 'abimize', 'abimizin', 'abimle', 
+        'abimler', 'abin', 'abindi', 'abinin', 'abiniz', 'abinizde', 'abinizi', 'abisi', 'abisine', 
+        'abisinin', 'abiydi', 'abiyeleri', 'abiyi', 'abla', 'ablaların', 'ablamız', 'ablamızın', 'ablanın', 
+        'ablası', 'amblem', 'amblemli', 'tablet', 'tablo', 'tablosu', 'anlamda', 'banyo', 'abonelik', 
+        'abonesi', 'abonesiyim', 'abonesiyiz', 'aboneyim', 'aboneyiz', 'aborjin', 'ampul', 'abs', 'absent', 
+        'absürt', 'absürtlerdi', 'absürtlük', 'abu', 'albüm', 'büyük', 'acaba', 'açabildi', 'açabildik', 
+        'açabildiler', 'açabildim', 'açabilecek', 'açabilir', 'açabilirdi', 'açabilirdiler', 'açabilirdim', 
+        'açabilirim', 'açabiliriz', 'açabilirler', 'açabilirlerdi', 'açabiliyor', 'açabiliyordu', 'açabiliyorduk', 
+        'açabiliyorlardı', 'açabiliyorsunuz', 'açabilmek', 'açacak', 'açacağı', 'açacağım', 'açacağımız', 
+        'açacağız', 'açacaklar', 'açacaktım', 'uçak', 'açılabilir', 'açama', 'açamadı', 'açamadık', 
+        'açamadığımız', 'açamadığım', 'açamadıkları', 'açamadılar', 'açamadım', 'açamam', 'açmasını', 
+        'açamayabilir', 'açamayız', 'acemi', 'acemiydi', 'açamıyorsunuz', 'açamıyoruz', 'açamıyorduk', 
+        'açamıyordum', 'açamıyorsun', 'açamıyorum', 'açan', 'açarak', 'açarsanız', 'açısından', 'aceleci', 
+        'aceleciler', 'acelecilerdi', 'acelecilik', 'aceleciydi', 'aceleciydi', 'aceleciydi', 'acelemi', 
+        'acelemiz', 'acelemizde', 'acelemize', 'aceleniz', 'acelesi', 'aceleydi', 'açelya', 'acemice', 
+        'acemicilik', 'acemide', 'acemiler', 'acemilerdi', 'acemilerdir', 'acemilere', 'acemileri', 
+        'acemilerin', 'acemiliği', 'acemiler', 'acemilik', 'acemilikler', 'acemiliklerden', 'acemilikleri', 
+        'acemilikten', 'aceminin', 'acemisi', 'acemisin', 'acemisiydi', 'acemisiydik', 'acemisiyim', 
+        'acemisiymiş', 'acemiydik', 'acemiydiler', 'acemiydiniz', 'acemiyi', 'acemiyiz', 'acemiymiş', 
+        'acemiyse', 'acenteden', 'acenteye', 'acenteci', 'acentede', 'acentedeki', 'acentedekiler', 
+        'acentedir', 'acenteler', 'acentelere', 'acentelerde', 'acentelerdeki', 'acentelerden', 'acenteleri', 
+        'acentelerin', 'acentelerle', 'acenteliği', 'acentem', 'acenteme', 'acentemde', 'acentemdeki', 
+        'acentemden', 'acentemiz', 'acentemi', 'acentemize', 'acentemizce', 'acentemizde', 'acentemizden', 
+        'acentemle', 'acenteniz', 'acentenize', 'acentenizde', 'acentenizdeki', 'acentenizden', 'acentenizi', 
+        'acentenizin', 'acentenizle', 'acentesinden', 'acentesine', 'acentesinde', 'acentesindeki', 
+        'acentesini', 'acentesinin', 'acentesiyle', 'acenteydi', 'acenteyi', 'çeşit', 'asetat', 'acı', 
+        'açı', 'acıbadem', 'açıcı', 'açıdan', 'acil', 'açık', 'açıkçası', 'açıkgöz', 'açıkken', 'açıklama', 
+        'açıklamalar', 'açıklamaları', 'açıklamalı', 'açıklaması', 'açıklamasında', 'açıklayıcı', 'acıklı', 
+        'açıköğretim', 'açıktaki', 'açıktan', 'acildir', 'açılabilen', 'açılan', 'acildi', 'açılım', 
+        'açılır', 'açılış', 'açılıyor', 'açılıyordu', 'açlık', 'açılmadan', 'açılmalı', 'açılmaması', 
+        'açılmamış', 'açılmasına', 'açılmaya', 'açılmayacak', 'açılmış', 'açılmışken', 'açılmıyor', 
+        'açılmıyordu', 'açımdan', 'açımca', 'açıp', 'acısız', 'acıtıyor', 'acıyor', 'açıyordu', 'açıyorlar', 
+        'açıyorsunuz', 'açıyorum', 'avize', 'acibe', 'açığa', 'açığı', 'açığına', 'açıkça', 'açıktı', 
+        'açıklamaya', 'açıkladı', 'açıkladığım', 'açıkladığınız', 'açıkladılar', 'açıkladım', 'açıklamalara', 
+        'açıklamacı', 'açıklamada', 'açıklamadı', 'açıklamadılar', 'açıklamak', 'açıklamalarına', 'açıklamamışlardı', 
+        'açıklamanızda', 'açıklamasını', 'açıklamayı', 'açıklamıştım', 'açıklanamadı', 'açıklanamayan', 
+        'açıklanmış', 'açıklanmıştı', 'açıklar', 'açıklardaki', 'açıkları', 'açıklarım', 'açıklarında', 
+        'açıklarını', 'açıklasın', 'açıklasınlar', 'açıklayabilirdi', 'açıklayabilirim', 'açıklayabilirler', 
+        'açıklayabilirlerdi', 'açıklayama', 'açıklayamadı', 'açıklayamam', 'açıklayamıyorum', 'açıklayarak', 
+        'açıklayıp', 'açıklığı', 'açıklık', 'açıklıktan', 'açıklayacağız', 'açıkta', 'açılabildi', 
+        'açılabilecek', 'açılabilirdi', 'açılabilirse', 'açılabiliyor', 'açılabiliyordu', 'açılacağı', 
+        'açılacağını', 'açılacak', 'açılacakmış', 'açılacaktı', 'açılacaktır', 'açılama', 'açılamamışlar', 
+        'açılamaz', 'açılarak', 'acilde', 'acilden', 'acildeydim', 'açıldı', 'açıldığı', 'açıldığında', 
+        'açıldığındaki', 'açıldığından', 'açıldığını', 'açıldıkça', 'açıldıktan', 'acile', 'açılıyorum', 
+        'açılıp', 'açılırdı', 'açılırken', 'açılırsa', 'açılışında', 'açılışındaki', 'aciliyeti', 'aciliyetinden', 
+        'açılıyorsa', 'acillere', 'acillik', 'açılma', 'açılmadı', 'açılmadığı', 'açılmadığından', 'açılmadığını', 
+        'açılmakta', 'açılmaktadır', 'açılmalıydı', 'açılmamaktadır', 'açılmamalı', 'açılmamasından', 'açılmamışı', 
+        'açılmamıştı', 'açılmasa', 'açılması', 'açılmasından', 'açılmasını', 'açılmayabilir', 'açılmayabiliyordu', 
+        'açılmayacağız', 'açılmayacağına', 'açılmayan', 'açılmıştır', 'açılmıştı', 'açılsa', 'acilse', 
+        'açılışı', 'açılsın', 'açıyor', 'açılsan', 'açışımdan', 'açışınızdan', 'açıyormuş', 'aciz', 'acizdi', 
+        'acizdiler', 'acizdir', 'acizler', 'acizlerdi', 'acizlik', 'acizlikti', 'açken', 'açlar', 'atlet', 
+        'açlıkla', 'açlıktan', 'açlığın', 'çalışamıyoruz', 'çalışıyor', 'çalışmak', 'çalışması', 'çalışmıyordu', 
+        'açma', 'açmadan', 'açmadık', 'açmadı', 'açmadığım', 'açmadıkça', 'açmadılar', 'açmadınız', 'açmak', 
+        'açmalar', 'açmalarını', 'açmalık', 'açmalısınız', 'açmam', 'açmama', 'açmamı', 'açmamışlar', 
+        'açmamışlardı', 'açmamıştı', 'açmamıza', 'açmanız', 'açmasına', 'açmasınlar', 'açmaya', 'açmayabiliyorlar', 
+        'açmayacaksalar', 'açmayı', 'açmayın', 'açmazlar', 'açmazsanız', 'açmış', 'açmıştır', 'açmıyor', 
+        'açmışlar', 'açmışlardı', 'açmıyorlar', 'açmıyorlardı', 'açmıyordu', 'açınız', 'çantası', 'çok', 
+        'açar', 'açsa', 'açsak', 'açsalar', 'açsalardı', 'açsam', 'açtılar', 'açtırmak', 'aktivite', 
+        'aktiviteler', 'açtı', 'açtığım', 'açtığımda', 'açtığımızda', 'açtığınız', 'açtığınızda', 'açtık', 
+        'açtıkları', 'açtıklarını', 'açtıktan', 'açtım', 'açtınız', 'açtırabildik', 'açtırabildim', 
+        'açtırabiliyordum', 'açtıramadık', 'açtırana', 'açtıracak', 'açtırdı', 'açtırdık', 'açtırdılar', 
+        'açtırdım', 'açtırmadım', 'açtırmış', 'acun', 'acura', 'adaptör', 'adap', 'adaptörü', 'adaçayı', 
+        'ada', 'adadaki', 'daha', 'adaklık', 'adalardaki', 'adalardakini', 'adaletli', 'adaletsiz', 'adaletsizce', 
+        'adaletsizdi', 'adaletsizlik', 'adaletsizlikler', 'adaletsizlikti', 'adalı', 'adalılar', 'adalarına', 
+        'adalar', 'adam', 'adamlar', 'adamcağız', 'adamı', 'adamın', 'adamının', 'adamları', 'adamların', 
+        'adamlı', 'adanalı', 'adanalıyız', 'adanın', 'adapazarı', 'adapazarındaki', 'adaptörleri', 'adaptörlü', 
+        'adaşı', 'adasına', 'adasını', 'adasının', 'adasındaki', 'adayı', 'add', 'iade', 'adedi', 'dediğim', 
+        'adedimize', 'adedine', 'adedini', 'ederiz', 'değildi', 'adapte', 'eder', 'ederim', 'desteğinizi', 
+        'adetten', 'adetim', 'adetimiz', 'adetinde', 'adetinden', 'adetine', 'adetini', 'adetleri', 'adetleridir', 
+        'adetlerimizde', 'adetlerimize', 'adetlerimizi', 'adetlerinde', 'adetlerinden', 'adetlerine', 'adetlerini', 
+        'adetli', 'adetmiş', 'adettendir', 'adetti', 'baba', 'bacak', 'bahçe', 'bakış', 'balık', 'bara', 
+        'bardak', 'baş', 'beş', 'bey', 'beyaz', 'bil', 'bir', 'bit', 'bugün', 'burada', 'bütün', 'cami', 
+        'cevap', 'ceza', 'çanta', 'çevre', 'çiçek', 'çocuk', 'dağ', 'daha', 'değer', 'deli', 'deniz', 
+        'derhal', 'dost', 'dünya', 'düzen', 'elbise', 'emin', 'endişe', 'evli', 'fakat', 'fark', 'fırsat', 
+        'gece', 'gel', 'genç', 'git', 'göz', 'güzel', 'haber', 'hak', 'hasta', 'hayat', 'hemen', 'henüz', 
+        'her', 'hızlı', 'iş', 'içeri', 'için', 'iyi', 'kafa', 'kalan', 'kalp', 'kapı', 'karar', 'karşı', 
+        'kedi', 'kelime', 'kendi', 'kere', 'kız', 'kitap', 'köy', 'laf', 'liman', 'masa', 'mavi', 'mesaj', 
+        'metin', 'meyve', 'nasıl', 'neden', 'nere', 'normal', 'onlar', 'öyle', 'para', 'park', 'pek', 
+        'plan', 'renk', 'resim', 'sabah', 'saat', 'sahip', 'şehir', 'şey', 'şimdi', 'son', 'sonra', 
+        'soru', 'süre', 'tarih', 'tarz', 'tiyatro', 'toplum', 'uçak', 'uygun', 'ülke', 'üzere', 'var', 
+        'veri', 'veya', 'yani', 'yaşlı', 'yeni', 'yer', 'yol', 'zaman', 'zaten'
+    ];
+    
+    // Load Turkish words - now uses embedded list
+    async function loadTurkishWords() {
+        console.log(`${turkishWords.length} Türkçe kelime hazır.`);
+        return turkishWords;
+    }
+    
+    // Get random word starting with specific letter
+    function getRandomWordStartingWith(letter, words) {
+        const filteredWords = words.filter(word => 
+            word.toLowerCase().charAt(0) === letter.toLowerCase()
+        );
+        if (filteredWords.length === 0) {
+            // If no word found, return a simple word with that letter
+            return letter.toLowerCase() + 'e';
+        }
+        return filteredWords[Math.floor(Math.random() * filteredWords.length)];
+    }
+    
+    // Generate filler words
+    function generateFillerWords(count, words) {
+        const fillers = [];
+        for (let i = 0; i < count; i++) {
+            const randomWord = words[Math.floor(Math.random() * words.length)];
+            fillers.push(randomWord);
+        }
+        return fillers;
+    }
+    
+    document.getElementById('null-encode-btn')?.addEventListener('click', async () => {
+        const secretMessage = document.getElementById('null-encode-secret').value.toLowerCase();
+        const n = parseInt(document.getElementById('null-encode-n-value').value, 10);
+        
+        if (!secretMessage) return showToast("Lütfen gizlenecek bir mesaj girin.", true);
+        if (isNaN(n) || n < 1) return showToast("Lütfen geçerli bir atlama değeri (N) girin.", true);
+        
+        const words = await loadTurkishWords();
+        if (words.length === 0) return showToast("Kelime listesi boş, lütfen sayfayı yenileyin.", true);
+        
+        const resultDiv = document.getElementById('null-encode-result');
+        resultDiv.innerHTML = '<div class="text-center text-gray-400">Metin oluşturuluyor...</div>';
+        
+        setTimeout(() => {
+            const messageChars = secretMessage.split('');
+            const generatedWords = [];
+            
+            for (let i = 0; i < messageChars.length; i++) {
+                const char = messageChars[i];
+                const position = i * n; // Position where the secret letter should be
+                
+                // Add filler words before the secret word
+                const fillersNeeded = n - 1;
+                const fillers = generateFillerWords(fillersNeeded, words);
+                generatedWords.push(...fillers);
+                
+                // Add the word that starts with the secret character
+                const secretWord = getRandomWordStartingWith(char, words);
+                generatedWords.push(secretWord);
+            }
+            
+            // Add some extra filler words at the end
+            const extraFillers = generateFillerWords(5 + Math.floor(Math.random() * 10), words);
+            generatedWords.push(...extraFillers);
+            
+            const resultText = generatedWords.join(' ');
+            resultDiv.innerHTML = `
+                <div class="space-y-2">
+                    <div class="text-sm text-gray-400">Oluşturulan Metin:</div>
+                    <div class="bg-gray-700 p-3 rounded text-white text-sm max-h-40 overflow-y-auto">${resultText}</div>
+                    <button onclick="navigator.clipboard.writeText('${resultText.replace(/'/g, "\\'")}'); showToast('Metin panoya kopyalandı!')" 
+                            class="w-full bg-gray-600 hover:bg-gray-500 text-white py-1 px-2 rounded text-sm">
+                        Panoya Kopyala
+                    </button>
+                </div>
+            `;
+        }, 100);
+    });
+    
+    document.getElementById('null-decode-btn')?.addEventListener('click', () => {
+        const text = document.getElementById('null-decode-stego').value;
+        const n = parseInt(document.getElementById('null-n-value').value, 10);
+        if (isNaN(n) || n < 1) return showToast("Lütfen geçerli bir atlama değeri (N) girin.", true);
+        const words = text.split(/[\s\n]+/).filter(word => word.length > 0);
+        let result = '';
+        for (let i = n - 1; i < words.length; i += n) {
+            result += words[i][0] || '';
+        }
+        document.getElementById('null-decode-result').textContent = result;
+    });
+    
+    // --- AUDIO LSB LISTENERS ---
+    document.getElementById('audio-decode-upload')?.addEventListener('change', (e) => { 
+        document.getElementById('audio-decode-filename').textContent = e.target.files[0]?.name || ''; 
+    });
+
+    document.getElementById('audio-encode-btn')?.addEventListener('click', () => {
+        const secretMessage = document.getElementById('audio-encode-secret').value;
+        if (!secretMessage) return showToast("Lütfen gizlenecek bir mesaj girin.", true);
+        
+        toggleLoader('audio-encode-loader', true);
+        // Using setTimeout to prevent UI freezing on heavy computation
+        setTimeout(() => {
+            try {
+                const binaryMessage = textToBinary(secretMessage) + MESSAGE_TERMINATOR;
+                const sampleRate = 44100;
+                const numSamples = Math.max(sampleRate * 2, binaryMessage.length); // At least 2 seconds
+                const data = new Int16Array(numSamples);
+                
+                for (let i = 0; i < numSamples; i++) {
+                    // Generate a simple sine wave
+                    data[i] = Math.floor(Math.sin(i / sampleRate * 440 * 2 * Math.PI) * 16384);
+                    // Embed message bit
+                    if (i < binaryMessage.length) {
+                        data[i] = (data[i] & 0xFFFE) | parseInt(binaryMessage[i], 2);
+                    }
+                }
+                
+                const buffer = new ArrayBuffer(44 + data.length * 2);
+                const view = new DataView(buffer);
+
+                // WAV header
+                const writeString = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
+                writeString(0, 'RIFF');
+                view.setUint32(4, 36 + data.length * 2, true);
+                writeString(8, 'WAVE');
+                writeString(12, 'fmt ');
+                view.setUint32(16, 16, true);
+                view.setUint16(20, 1, true); // PCM
+                view.setUint16(22, 1, true); // Mono
+                view.setUint32(24, sampleRate, true);
+                view.setUint32(28, sampleRate * 2, true);
+                view.setUint16(32, 2, true);
+                view.setUint16(34, 16, true);
+                writeString(36, 'data');
+                view.setUint32(40, data.length * 2, true);
+
+                // Write PCM data
+                for (let i = 0; i < data.length; i++) {
+                    view.setInt16(44 + i * 2, data[i], true);
+                }
+
+                const blob = new Blob([view], { type: 'audio/wav' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'gizli-ses.wav';
+                a.click();
+                URL.revokeObjectURL(url);
+
+            } catch(e) {
+                showToast("Ses dosyası oluşturulurken hata oluştu.", true);
+            } finally {
+                toggleLoader('audio-encode-loader', false);
+            }
+        }, 50); // Small delay
+    });
+
+    document.getElementById('audio-decode-btn')?.addEventListener('click', () => {
+        const file = document.getElementById('audio-decode-upload').files[0];
+        if (!file) return showToast("Lütfen bir WAV dosyası seçin.", true);
+
+        toggleLoader('audio-decode-loader', true);
+        document.getElementById('audio-decode-result').textContent = '';
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const arrayBuffer = e.target.result;
+                const view = new DataView(arrayBuffer);
+                
+                // Check WAV header
+                const riff = String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2), view.getUint8(3));
+                const wave = String.fromCharCode(view.getUint8(8), view.getUint8(9), view.getUint8(10), view.getUint8(11));
+                
+                if (riff !== 'RIFF' || wave !== 'WAVE') {
+                    return showToast("Geçersiz WAV dosyası formatı.", true);
+                }
+
+                // Find data chunk
+                let dataOffset = 12;
+                while (dataOffset < arrayBuffer.byteLength - 8) {
+                    const chunkId = String.fromCharCode(
+                        view.getUint8(dataOffset), view.getUint8(dataOffset + 1),
+                        view.getUint8(dataOffset + 2), view.getUint8(dataOffset + 3)
+                    );
+                    const chunkSize = view.getUint32(dataOffset + 4, true);
+                    
+                    if (chunkId === 'data') {
+                        dataOffset += 8;
+                        break;
+                    }
+                    dataOffset += 8 + chunkSize;
+                }
+
+                // Extract LSB from audio samples
+                let binaryMessage = '';
+                for (let i = dataOffset; i < arrayBuffer.byteLength - 1; i += 2) {
+                    const sample = view.getInt16(i, true);
+                    binaryMessage += (sample & 1).toString();
+                    
+                    // Check for terminator
+                    if (binaryMessage.length > MESSAGE_TERMINATOR.length && 
+                        binaryMessage.endsWith(MESSAGE_TERMINATOR)) {
+                        break;
+                    }
+                }
+
+                const terminatorIndex = binaryMessage.lastIndexOf(MESSAGE_TERMINATOR);
+                if (terminatorIndex !== -1) {
+                    const extractedBinary = binaryMessage.substring(0, terminatorIndex);
+                    const decodedMessage = binaryToText(extractedBinary);
+                    document.getElementById('audio-decode-result').textContent = decodedMessage || "Gizli mesaj bulunamadı.";
+                } else {
+                    document.getElementById('audio-decode-result').textContent = "Bu ses dosyasında gizli mesaj bulunamadı.";
+                }
+
+            } catch (error) {
+                showToast("Ses dosyası okunurken hata oluştu.", true);
+                console.error(error);
+            } finally {
+                toggleLoader('audio-decode-loader', false);
+            }
+        };
+        
+        reader.onerror = () => {
+            showToast("Dosya okunamadı.", true);
+            toggleLoader('audio-decode-loader', false);
+        };
+        
+        reader.readAsArrayBuffer(file);
+    });
+
+    // --- METADATA STEGANOGRAPHY LISTENERS ---
+    document.getElementById('meta-encode-upload')?.addEventListener('change', (e) => { 
+        document.getElementById('meta-encode-filename').textContent = e.target.files[0]?.name || '';
+        if (e.target.files[0]) {
+            displayImageMetadata(e.target.files[0]);
+        }
+    });
+    document.getElementById('meta-decode-upload')?.addEventListener('change', (e) => { 
+        document.getElementById('meta-decode-filename').textContent = e.target.files[0]?.name || '';
+        if (e.target.files[0]) {
+            displayImageMetadata(e.target.files[0]);
+        }
+    });
+
+    document.getElementById('meta-encode-btn')?.addEventListener('click', async () => {
+        const file = document.getElementById('meta-encode-upload').files[0];
+        const message = document.getElementById('meta-encode-message').value;
+        const key = document.getElementById('meta-encode-key').value;
+        
+        if (!file) return showToast("Lütfen bir resim dosyası seçin.", true);
+        if (!message) return showToast("Lütfen gizlenecek bir mesaj girin.", true);
+        if (!key) return showToast("Lütfen bir anahtar girin.", true);
+
+        toggleLoader('meta-encode-loader', true);
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const modifiedBuffer = embedMessageInImage(arrayBuffer, key, message);
+            
+            // Determine output format based on input
+            const data = new Uint8Array(arrayBuffer);
+            const imageType = detectImageType(data);
+            const mimeType = imageType === 'PNG' ? 'image/png' : 'image/jpeg';
+            const extension = imageType === 'PNG' ? '.png' : '.jpg';
+            
+            const blob = new Blob([modifiedBuffer], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const originalName = file.name.replace(/\.[^/.]+$/, "");
+            a.download = 'metadata-gizli-' + originalName + extension;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast("Mesaj dosyaya gizlendi ve indirildi!");
+        } catch (error) {
+            showToast("Dosya işlenirken hata oluştu: " + error.message, true);
+            console.error(error);
+        } finally {
+            toggleLoader('meta-encode-loader', false);
+        }
+    });
+
+    document.getElementById('meta-decode-btn')?.addEventListener('click', async () => {
+        const file = document.getElementById('meta-decode-upload').files[0];
+        const key = document.getElementById('meta-decode-key').value;
+        
+        if (!file) return showToast("Lütfen bir resim dosyası seçin.", true);
+        if (!key) return showToast("Lütfen bir anahtar girin.", true);
+
+        toggleLoader('meta-decode-loader', true);
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const message = extractMessageFromImage(arrayBuffer, key);
+            
+            if (message) {
+                document.getElementById('meta-decode-result').textContent = message;
+                showToast("Gizli mesaj bulundu!");
+            } else {
+                document.getElementById('meta-decode-result').textContent = "Bu anahtar ile gizli mesaj bulunamadı.";
+            }
+        } catch (error) {
+            showToast("Dosya okunurken hata oluştu: " + error.message, true);
+            console.error(error);
+        } finally {
+            toggleLoader('meta-decode-loader', false);
+        }
+    });
+}
+</script>
+</body>
+</html>
+

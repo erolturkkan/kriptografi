@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sezar Şifresi - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .wheel {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                    
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <!-- Explanation Section -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 mb-8 border border-gray-700">
+            <h2 class="text-3xl font-bold text-white mb-4">📜 Sezar Şifresi Nedir?</h2>
+            <div class="text-gray-300 space-y-3">
+                <p>
+                    <strong>Sezar Şifresi</strong>, tarihteki en eski ve en basit şifreleme yöntemlerinden biridir. 
+                    Julius Caesar tarafından askeri haberleşmede kullanıldığı için bu adı almıştır.
+                </p>
+                <p>
+                    Bu yöntem, alfabedeki her harfi <strong>belirli sayıda kaydırarak</strong> şifrelemek prensibine dayanır. 
+                    Örneğin, 3 kaydırmalı bir Sezar şifresinde:
+                </p>
+                <div class="bg-gray-900 p-4 rounded-lg font-mono text-sm">
+                    <div class="text-yellow-400">Düz Metin: A B C D E F ...</div>
+                    <div class="text-green-400">Şifreli: D E F G H I ...</div>
+                </div>
+                <p>
+                    <strong class="text-yellow-400">⚠️ Güvenlik Notu:</strong> Sezar şifresi günümüzde güvenli değildir çünkü 
+                    sadece 26 farklı olasılık vardır (Türkçe alfabesi için 29). Ancak simetrik şifrelemenin temel mantığını 
+                    anlamak için mükemmel bir örnektir.
+                </p>
+            </div>
+        </section>
+
+        <!-- Main App -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 border border-gray-700">
+            
+            <!-- Mode Selection -->
+            <div class="flex justify-center mb-6">
+                <div class="bg-gray-900 rounded-lg p-1 inline-flex">
+                    <button id="encryptBtn" class="px-6 py-2 rounded-md font-semibold transition bg-yellow-500 text-gray-900">
+                        Şifrele
+                    </button>
+                    <button id="decryptBtn" class="px-6 py-2 rounded-md font-semibold transition text-gray-400">
+                        Çöz
+                    </button>
+                </div>
+            </div>
+
+            <!-- Shift Control -->
+            <div class="mb-6">
+                <label class="block text-lg font-semibold text-gray-200 mb-3">
+                    Kaydırma Miktarı: <span id="shiftValue" class="text-yellow-400">3</span>
+                </label>
+                <input type="range" id="shiftSlider" min="1" max="28" value="3" 
+                    class="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>1</span>
+                    <span>28</span>
+                </div>
+            </div>
+
+            <!-- Visual Alphabet Wheel -->
+            <div class="bg-gray-900 rounded-lg p-4 mb-6">
+                <h3 class="text-sm font-semibold text-gray-400 mb-3 text-center">Alfabe Eşleşmesi (İlk 10 Harf)</h3>
+                <div class="grid grid-cols-10 gap-2 text-center text-sm">
+                    <div class="space-y-2">
+                        <div class="bg-gray-700 py-2 rounded text-white font-mono">A</div>
+                        <div class="text-yellow-400">↓</div>
+                        <div id="map-0" class="bg-yellow-600 py-2 rounded text-gray-900 font-mono font-bold">D</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="bg-gray-700 py-2 rounded text-white font-mono">B</div>
+                        <div class="text-yellow-400">↓</div>
+                        <div id="map-1" class="bg-yellow-600 py-2 rounded text-gray-900 font-mono font-bold">E</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="bg-gray-700 py-2 rounded text-white font-mono">C</div>
+                        <div class="text-yellow-400">↓</div>
+                        <div id="map-2" class="bg-yellow-600 py-2 rounded text-gray-900 font-mono font-bold">F</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="bg-gray-700 py-2 rounded text-white font-mono">Ç</div>
+                        <div class="text-yellow-400">↓</div>
+                        <div id="map-3" class="bg-yellow-600 py-2 rounded text-gray-900 font-mono font-bold">G</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="bg-gray-700 py-2 rounded text-white font-mono">D</div>
+                        <div class="text-yellow-400">↓</div>
+                        <div id="map-4" class="bg-yellow-600 py-2 rounded text-gray-900 font-mono font-bold">Ğ</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="bg-gray-700 py-2 rounded text-white font-mono">E</div>
+                        <div class="text-yellow-400">↓</div>
+                        <div id="map-5" class="bg-yellow-600 py-2 rounded text-gray-900 font-mono font-bold">H</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="bg-gray-700 py-2 rounded text-white font-mono">F</div>
+                        <div class="text-yellow-400">↓</div>
+                        <div id="map-6" class="bg-yellow-600 py-2 rounded text-gray-900 font-mono font-bold">I</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="bg-gray-700 py-2 rounded text-white font-mono">G</div>
+                        <div class="text-yellow-400">↓</div>
+                        <div id="map-7" class="bg-yellow-600 py-2 rounded text-gray-900 font-mono font-bold">İ</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="bg-gray-700 py-2 rounded text-white font-mono">Ğ</div>
+                        <div class="text-yellow-400">↓</div>
+                        <div id="map-8" class="bg-yellow-600 py-2 rounded text-gray-900 font-mono font-bold">J</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="bg-gray-700 py-2 rounded text-white font-mono">H</div>
+                        <div class="text-yellow-400">↓</div>
+                        <div id="map-9" class="bg-yellow-600 py-2 rounded text-gray-900 font-mono font-bold">K</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input/Output -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-lg font-semibold text-gray-200 mb-2">
+                        <span id="inputLabel">Şifrelenecek Metin</span>
+                    </label>
+                    <textarea id="inputText" rows="8" placeholder="Mesajınızı buraya yazın..."
+                        class="w-full p-4 bg-gray-900 border-2 border-gray-700 rounded-lg focus:outline-none focus:border-yellow-500 transition resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-lg font-semibold text-gray-200 mb-2">
+                        <span id="outputLabel">Şifreli Metin</span>
+                    </label>
+                    <textarea id="outputText" rows="8" readonly
+                        class="w-full p-4 bg-gray-900 border-2 border-yellow-600 rounded-lg font-mono text-yellow-400 resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="flex flex-wrap gap-3 mt-6">
+                <button id="processBtn" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-6 rounded-lg transition">
+                    <span id="processText">Şifrele</span>
+                </button>
+                <button id="clearBtn" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition">
+                    Temizle
+                </button>
+                <button id="copyBtn" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition">
+                    Kopyala
+                </button>
+            </div>
+
+        </section>
+
+        <!-- Examples Section -->
+        <section class="bg-gray-800 rounded-xl p-6 md:p-8 mt-8 border border-gray-700">
+            <h3 class="text-2xl font-bold text-white mb-4">💡 Örnek Mesajlar</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <button class="example-btn bg-gray-900 hover:bg-gray-700 p-4 rounded-lg text-left transition border border-gray-600">
+                    <div class="font-semibold text-yellow-400 mb-1">Örnek 1</div>
+                    <div class="text-sm text-gray-400">MERHABA DUNYA</div>
+                </button>
+                <button class="example-btn bg-gray-900 hover:bg-gray-700 p-4 rounded-lg text-left transition border border-gray-600">
+                    <div class="font-semibold text-yellow-400 mb-1">Örnek 2</div>
+                    <div class="text-sm text-gray-400">GIZLI MESAJ</div>
+                </button>
+                <button class="example-btn bg-gray-900 hover:bg-gray-700 p-4 rounded-lg text-left transition border border-gray-600">
+                    <div class="font-semibold text-yellow-400 mb-1">Örnek 3</div>
+                    <div class="text-sm text-gray-400">KRIPTOGRAFI OGRENMEK EGLENCELI</div>
+                </button>
+                <button class="example-btn bg-gray-900 hover:bg-gray-700 p-4 rounded-lg text-left transition border border-gray-600">
+                    <div class="font-semibold text-yellow-400 mb-1">Örnek 4</div>
+                    <div class="text-sm text-gray-400">SEZAR SIFRESI</div>
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const ALPHABET = 'ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ';
+        
+        let mode = 'encrypt';
+        let shift = 3;
+
+        const encryptBtn = document.getElementById('encryptBtn');
+        const decryptBtn = document.getElementById('decryptBtn');
+        const shiftSlider = document.getElementById('shiftSlider');
+        const shiftValue = document.getElementById('shiftValue');
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const processBtn = document.getElementById('processBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const inputLabel = document.getElementById('inputLabel');
+        const outputLabel = document.getElementById('outputLabel');
+        const processText = document.getElementById('processText');
+
+        // Mode switching
+        encryptBtn.addEventListener('click', () => {
+            mode = 'encrypt';
+            encryptBtn.classList.add('bg-yellow-500', 'text-gray-900');
+            encryptBtn.classList.remove('text-gray-400');
+            decryptBtn.classList.remove('bg-yellow-500', 'text-gray-900');
+            decryptBtn.classList.add('text-gray-400');
+            inputLabel.textContent = 'Şifrelenecek Metin';
+            outputLabel.textContent = 'Şifreli Metin';
+            processText.textContent = 'Şifrele';
+            updateOutput();
+        });
+
+        decryptBtn.addEventListener('click', () => {
+            mode = 'decrypt';
+            decryptBtn.classList.add('bg-yellow-500', 'text-gray-900');
+            decryptBtn.classList.remove('text-gray-400');
+            encryptBtn.classList.remove('bg-yellow-500', 'text-gray-900');
+            encryptBtn.classList.add('text-gray-400');
+            inputLabel.textContent = 'Şifreli Metin';
+            outputLabel.textContent = 'Çözülmüş Metin';
+            processText.textContent = 'Çöz';
+            updateOutput();
+        });
+
+        // Shift slider
+        shiftSlider.addEventListener('input', (e) => {
+            shift = parseInt(e.target.value);
+            shiftValue.textContent = shift;
+            updateAlphabetMap();
+            updateOutput();
+        });
+
+        // Update alphabet mapping visualization
+        function updateAlphabetMap() {
+            for (let i = 0; i < 10; i++) {
+                const shiftedIndex = (i + shift) % ALPHABET.length;
+                document.getElementById(`map-${i}`).textContent = ALPHABET[shiftedIndex];
+            }
+        }
+
+        // Caesar cipher function
+        function caesarCipher(text, shift, decrypt = false) {
+            const actualShift = decrypt ? -shift : shift;
+            return text.toUpperCase().split('').map(char => {
+                const index = ALPHABET.indexOf(char);
+                if (index === -1) return char; // Keep non-alphabet chars
+                const newIndex = (index + actualShift + ALPHABET.length) % ALPHABET.length;
+                return ALPHABET[newIndex];
+            }).join('');
+        }
+
+        // Process text
+        function updateOutput() {
+            const input = inputText.value;
+            if (!input) {
+                outputText.value = '';
+                return;
+            }
+            outputText.value = caesarCipher(input, shift, mode === 'decrypt');
+        }
+
+        inputText.addEventListener('input', updateOutput);
+        processBtn.addEventListener('click', updateOutput);
+
+        clearBtn.addEventListener('click', () => {
+            inputText.value = '';
+            outputText.value = '';
+        });
+
+        copyBtn.addEventListener('click', () => {
+            outputText.select();
+            document.execCommand('copy');
+            copyBtn.textContent = 'Kopyalandı!';
+            setTimeout(() => {
+                copyBtn.textContent = 'Kopyala';
+            }, 2000);
+        });
+
+        // Example buttons
+        document.querySelectorAll('.example-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const text = e.currentTarget.querySelector('.text-sm').textContent;
+                inputText.value = text;
+                updateOutput();
+            });
+        });
+
+        // Initialize
+        updateAlphabetMap();
+    </script>
+
+</body>
+</html>

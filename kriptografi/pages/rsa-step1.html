@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSA Adım 1: Anahtar Üretimi - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800/80 backdrop-blur-xl border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-purple-400 hover:text-purple-300 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold hidden md:inline">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm text-gray-400">Adım 1 / 3</span>
+                <span class="text-sm text-purple-400 font-semibold">33%</span>
+            </div>
+            <div class="w-full bg-gray-700 rounded-full h-2">
+                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" style="width: 33%"></div>
+            </div>
+        </div>
+
+        <!-- Main Title -->
+        <div class="text-center mb-8">
+            <div class="inline-block bg-purple-500/20 rounded-full px-4 py-2 mb-4">
+                <span class="text-purple-300 font-semibold">🔑 Adım 1</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Anahtar Üretimi</h1>
+            <p class="text-xl text-gray-400">Açık ve Özel Anahtar Çiftini Oluşturma</p>
+        </div>
+
+        <!-- Explanation -->
+        <div class="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-2xl p-6 md:p-8 mb-8">
+            <h3 class="text-xl font-bold text-white mb-3 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Açıklama
+            </h3>
+            <p class="text-gray-300 leading-relaxed">
+                Lütfen birbirinden farklı iki <strong class="text-purple-400">asal sayı</strong> (P ve Q) giriniz. 
+                RSA algoritması bu asal sayıları kullanarak açık ve gizli anahtar çiftini oluşturur.
+            </p>
+            <div class="mt-4 bg-purple-900/20 rounded-lg p-4">
+                <p class="text-purple-200 text-sm mb-2">
+                    💡 <strong>Önemli:</strong> P × Q değeri en az 128 olmalıdır (tüm karakterler için).
+                </p>
+                <p class="text-purple-200 text-sm">
+                    <strong>Önerilen değerler:</strong> P=11, Q=13 (N=143) veya P=13, Q=17 (N=221)
+                </p>
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <div class="bg-gray-800/50 backdrop-blur border border-gray-700 rounded-2xl p-6 md:p-8 mb-8">
+            <div class="space-y-6">
+                <div>
+                    <label for="p-value" class="block text-sm font-semibold text-gray-300 mb-2">
+                        Asal Sayı P:
+                    </label>
+                    <input 
+                        type="number" 
+                        id="p-value" 
+                        value="11" 
+                        min="2"
+                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    >
+                </div>
+                <div>
+                    <label for="q-value" class="block text-sm font-semibold text-gray-300 mb-2">
+                        Asal Sayı Q:
+                    </label>
+                    <input 
+                        type="number" 
+                        id="q-value" 
+                        value="13" 
+                        min="2"
+                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    >
+                </div>
+                <button 
+                    onclick="generateKeys()" 
+                    class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-6 rounded-lg transition shadow-lg">
+                    🔐 Anahtarları Hesapla
+                </button>
+            </div>
+        </div>
+
+        <!-- Output Panel -->
+        <div id="key-outputs" class="hidden bg-gradient-to-br from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-2xl p-6 md:p-8 mb-8">
+            <h3 class="text-2xl font-bold text-green-400 mb-6 flex items-center">
+                <svg class="w-7 h-7 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Hesaplanan Anahtarlar
+            </h3>
+            
+            <div class="space-y-4 mb-6">
+                <div class="bg-gray-800/50 rounded-lg p-4">
+                    <p class="text-gray-400 text-sm mb-1">Modül N (Ortak Değer)</p>
+                    <p class="text-2xl font-bold text-white"><span id="N-display"></span></p>
+                </div>
+                <div class="bg-gray-800/50 rounded-lg p-4">
+                    <p class="text-gray-400 text-sm mb-1">Euler Totient φ(N)</p>
+                    <p class="text-2xl font-bold text-white"><span id="phi-display"></span></p>
+                </div>
+                <div class="bg-gray-800/50 rounded-lg p-4">
+                    <p class="text-gray-400 text-sm mb-1">Açık Üs E (Public Key)</p>
+                    <p class="text-2xl font-bold text-green-400"><span id="E-display"></span></p>
+                </div>
+                <div class="bg-gray-800/50 rounded-lg p-4">
+                    <p class="text-gray-400 text-sm mb-1">Gizli Üs D (Private Key)</p>
+                    <p class="text-2xl font-bold text-red-400"><span id="D-display"></span></p>
+                </div>
+            </div>
+
+            <!-- Calculation Steps -->
+            <div class="bg-gradient-to-r from-cyan-900/20 to-blue-900/20 border border-cyan-500/30 rounded-xl p-6 mb-6">
+                <h4 class="text-lg font-bold text-cyan-400 mb-4">📊 Hesaplama Adımları:</h4>
+                <div class="space-y-3 text-gray-300 font-mono text-sm">
+                    <p><span class="text-cyan-400 font-bold">Adım 1:</span> N = P × Q = <span id="step-n-calc" class="text-white font-bold"></span></p>
+                    <p><span class="text-cyan-400 font-bold">Adım 2:</span> φ(N) = (P-1) × (Q-1) = <span id="step-phi-calc" class="text-white font-bold"></span></p>
+                    <p><span class="text-cyan-400 font-bold">Adım 3:</span> E = <span id="step-e-calc" class="text-white font-bold"></span></p>
+                    <p><span class="text-cyan-400 font-bold">Adım 4:</span> D = E<sup>-1</sup> mod φ(N) = <span id="step-d-calc" class="text-white font-bold"></span></p>
+                    <p><span class="text-green-400 font-bold">Doğrulama:</span> (E × D) mod φ(N) = <span id="step-verify" class="text-green-400 font-bold"></span> ✓</p>
+                </div>
+            </div>
+
+            <!-- Key Summary -->
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-gradient-to-br from-green-900/30 to-emerald-900/30 border-2 border-green-500/50 rounded-xl p-6">
+                    <div class="text-3xl mb-2">🔑</div>
+                    <h4 class="text-lg font-bold text-green-400 mb-2">Public Key (Açık Anahtar)</h4>
+                    <p class="text-white font-bold text-xl mb-2">(<span id="E-public"></span>, <span id="N-public"></span>)</p>
+                    <p class="text-gray-400 text-sm">Bu anahtar şifrelemek isteyen herkesle paylaşılır.</p>
+                </div>
+                <div class="bg-gradient-to-br from-red-900/30 to-pink-900/30 border-2 border-red-500/50 rounded-xl p-6">
+                    <div class="text-3xl mb-2">🔒</div>
+                    <h4 class="text-lg font-bold text-red-400 mb-2">Private Key (Özel Anahtar)</h4>
+                    <p class="text-white font-bold text-xl mb-2">(<span id="D-private"></span>, <span id="N-private"></span>)</p>
+                    <p class="text-gray-400 text-sm">Bu anahtar GİZLİ kalmalıdır!</p>
+                </div>
+            </div>
+
+            <!-- Next Step Button -->
+            <div class="mt-8">
+                <a href="rsa-step2.html" class="block w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-6 rounded-lg transition shadow-lg text-center">
+                    Adım 2'ye Geç: Şifreleme →
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function isPrime(num) {
+            if (num < 2) return false;
+            for (let i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        }
+
+        function gcd(a, b) {
+            while (b !== 0) {
+                let t = b;
+                b = a % b;
+                a = t;
+            }
+            return a;
+        }
+
+        function modInverse(e, phi) {
+            let m0 = phi, t, q;
+            let x0 = 0, x1 = 1;
+            if (phi === 1) return 0;
+            while (e > 1) {
+                q = Math.floor(e / phi);
+                t = phi;
+                phi = e % phi;
+                e = t;
+                t = x0;
+                x0 = x1 - q * x0;
+                x1 = t;
+            }
+            if (x1 < 0) x1 += m0;
+            return x1;
+        }
+
+        function generateKeys() {
+            const p = parseInt(document.getElementById('p-value').value);
+            const q = parseInt(document.getElementById('q-value').value);
+
+            if (!isPrime(p) || !isPrime(q)) {
+                alert('❌ Lütfen iki ASAL sayı giriniz!');
+                return;
+            }
+
+            if (p === q) {
+                alert('❌ P ve Q farklı olmalıdır!');
+                return;
+            }
+
+            const N = p * q;
+            
+            // N en az 128 olmalı (ASCII karakterleri için)
+            if (N < 128) {
+                alert(`❌ N değeri çok küçük! N = ${N}\n\nTüm karakterlerin şifrelenmesi için N ≥ 128 olmalıdır.\nDaha büyük asal sayılar seçiniz (örn: P=11, Q=13 → N=143)`);
+                return;
+            }
+
+            const phi = (p - 1) * (q - 1);
+            
+            // E'yi dinamik olarak bul (φ(N) ile aralarında asal olan bir sayı)
+            let E = 3;
+            while (E < phi) {
+                if (gcd(E, phi) === 1) {
+                    break;
+                }
+                E += 2; // Tek sayıları dene
+            }
+
+            if (gcd(E, phi) !== 1) {
+                alert('❌ Uygun E değeri bulunamadı. Farklı P ve Q deneyin!');
+                return;
+            }
+
+            const D = modInverse(E, phi);
+            
+            // Doğrulama
+            const verification = (E * D) % phi;
+            if (verification !== 1) {
+                alert(`❌ Anahtar doğrulama hatası! (E × D) mod φ(N) = ${verification} (1 olmalı)\nFarklı P ve Q deneyin!`);
+                return;
+            }
+
+            // Display results
+            document.getElementById('N-display').textContent = N;
+            document.getElementById('phi-display').textContent = phi;
+            document.getElementById('E-display').textContent = E;
+            document.getElementById('D-display').textContent = D;
+
+            // Calculation steps
+            document.getElementById('step-n-calc').textContent = `${p} × ${q} = ${N}`;
+            document.getElementById('step-phi-calc').textContent = `(${p}-1) × (${q}-1) = ${phi}`;
+            document.getElementById('step-e-calc').textContent = `${E} (gcd(${E}, ${phi}) = 1)`;
+            document.getElementById('step-d-calc').textContent = D;
+            document.getElementById('step-verify').textContent = verification;
+
+            // Key summary
+            document.getElementById('E-public').textContent = E;
+            document.getElementById('N-public').textContent = N;
+            document.getElementById('D-private').textContent = D;
+            document.getElementById('N-private').textContent = N;
+
+            // Show output
+            document.getElementById('key-outputs').classList.remove('hidden');
+            document.getElementById('key-outputs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Store keys in sessionStorage for next steps
+            sessionStorage.setItem('rsa_N', N);
+            sessionStorage.setItem('rsa_E', E);
+            sessionStorage.setItem('rsa_D', D);
+            sessionStorage.setItem('rsa_p', p);
+            sessionStorage.setItem('rsa_q', q);
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSL Sertifikası Oluşturma Atölyesi - Zero Trust</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/zt_favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        code, pre {
+            font-family: 'Fira Code', monospace;
+        }
+        .step-card {
+            transition: all 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        .code-container {
+            position: relative;
+            margin: 1rem 0;
+        }
+        .code-header {
+            background: #0f172a;
+            border-radius: 8px 8px 0 0;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+        .code-lang {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .copy-btn {
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .copy-btn:hover {
+            background: #334155;
+            color: #e2e8f0;
+            border-color: #475569;
+        }
+        .copy-btn.copied {
+            background: #166534;
+            color: #86efac;
+            border-color: #22c55e;
+        }
+        .code-block {
+            background: #1e293b;
+            border-radius: 0 0 8px 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 0;
+        }
+        .code-block.no-header {
+            border-radius: 8px;
+        }
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+        }
+        .code-block code {
+            color: #e2e8f0;
+            font-size: 0.875rem;
+            line-height: 1.7;
+            display: block;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-200 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800/80 backdrop-blur-xl border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="../index.html" class="flex items-center space-x-2 text-cyan-400 hover:text-cyan-300 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="font-semibold hidden md:inline">Ana Sayfaya Dön</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <img src="../assets/zt (160 x 160 piksel).svg" alt="Zero Trust" class="w-8 h-8 object-contain">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <div class="inline-block bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full px-6 py-3 mb-6">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 font-bold text-lg">
+                    🔐 İnteraktif Atölye
+                </span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                Kendi SSL Sertifikanı Oluştur
+            </h1>
+            <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                SSL/TLS sertifikalarının nasıl çalıştığını kendi başına, adım adım uygulayarak öğren. 
+                Her adımda hem gerekli komutları bulacak hem de bu komutların neden çalıştığını ve arkasındaki mantığı keşfedeceksin.
+            </p>
+        </div>
+
+        <!-- Introduction -->
+        <div class="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-2xl p-6 md:p-8 mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+                <svg class="w-7 h-7 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Bu Atölye Hakkında
+            </h2>
+            <p class="text-gray-300 leading-relaxed">
+                Bu rehber, SSL/TLS sertifikalarının nasıl çalıştığını teoriden pratiğe adım adım öğrenmen için tasarlandı. 
+                Her adımda hem gerekli komutları bulacak hem de bu komutların arkasındaki mantığı anlayacaksın. 
+                Kendi bilgisayarında güvenli bir web sunucusu kurarak "güvenli değil" ile "bağlantı güvenli" arasındaki farkı bizzat deneyimleyeceksin.
+            </p>
+        </div>
+
+        <!-- Step 0 -->
+        <div class="step-card bg-gradient-to-r from-gray-800/50 to-gray-700/50 border border-gray-600 rounded-2xl p-6 md:p-8 mb-6">
+            <div class="flex items-start space-x-4 mb-6">
+                <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    0
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-white mb-2">Bilgisayarına Kendi Alan Adını Tanıtmak</h3>
+                    <p class="text-gray-400 text-sm">Hosts dosyası yapılandırması</p>
+                </div>
+            </div>
+
+            <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-6">
+                <h4 class="text-red-300 font-bold mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                    Neden Gerekli?
+                </h4>
+                <p class="text-gray-300 text-sm leading-relaxed">
+                    Tarayıcılar <code class="text-orange-300">google.com</code> gibi bir adresi DNS sunucularına sorarak bulur. 
+                    Ama <code class="text-orange-300">erolturkkan</code> gibi kişisel bir ismi tanımazlar. 
+                    <strong>hosts dosyası</strong>, bilgisayarımızın DNS'e sormadan önce baktığı yerel bir "adres defteridir". 
+                    Bu adımla, bilgisayarına kendi adını <code class="text-orange-300">127.0.0.1</code> (yani "bu bilgisayar") olarak tanıtacaksın.
+                </p>
+            </div>
+
+            <!-- Windows Instructions -->
+            <div class="mb-6">
+                <h4 class="text-lg font-bold text-cyan-400 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                    </svg>
+                    Windows (Git Bash Kullanarak)
+                </h4>
+                
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-gray-300 mb-2"><strong>1.</strong> Git Bash'i Yönetici Olarak Başlat:</p>
+                        <ul class="list-disc list-inside text-gray-400 text-sm ml-4 space-y-1">
+                            <li>Windows Başlat menüsünü aç ve "Git Bash" yaz</li>
+                            <li>Uygulamanın üzerine sağ tıkla ve "Yönetici olarak çalıştır" seçeneğini seç</li>
+                            <li>Kullanıcı Hesabı Denetimi uyarısı çıkarsa "Evet" de</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <p class="text-gray-300 mb-2"><strong>2.</strong> Hosts Dosyasını nano Editörü ile Aç:</p>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span class="code-lang">Bash</span>
+                                <button onclick="copyCode(this, 'code-1')" class="copy-btn">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                    </svg>
+                                    Kopyala
+                                </button>
+                            </div>
+                            <div class="code-block">
+                                <code id="code-1">nano /c/Windows/System32/drivers/etc/hosts</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-gray-300 mb-2"><strong>3.</strong> Değişikliği Ekle ve Kaydet:</p>
+                        <ul class="list-disc list-inside text-gray-400 text-sm ml-4 space-y-1 mb-3">
+                            <li>Klavye ok tuşlarını kullanarak imleci dosyanın en sonuna getir</li>
+                            <li>Aşağıdaki satırı ekle (<code class="text-orange-300">[AdınızSoyadınız]</code> kısmını bitişik ve Türkçe karakter olmadan kendi adınla değiştir)</li>
+                        </ul>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span class="code-lang">Hosts File</span>
+                                <button onclick="copyCode(this, 'code-2')" class="copy-btn">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                    </svg>
+                                    Kopyala
+                                </button>
+                            </div>
+                            <div class="code-block">
+                                <code id="code-2">127.0.0.1   [AdınızSoyadınız]</code>
+                            </div>
+                        </div>
+                        <ul class="list-disc list-inside text-gray-400 text-sm ml-4 space-y-1 mt-3">
+                            <li>Dosyayı kaydetmek için <kbd class="bg-gray-700 px-2 py-1 rounded text-xs">Ctrl + O</kbd> tuşlarına bas ve ardından <kbd class="bg-gray-700 px-2 py-1 rounded text-xs">Enter</kbd></li>
+                            <li>Editörden çıkmak için <kbd class="bg-gray-700 px-2 py-1 rounded text-xs">Ctrl + X</kbd></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- macOS/Linux Instructions -->
+            <div class="mb-6">
+                <h4 class="text-lg font-bold text-purple-400 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M22 17.607c-.786 2.28-3.139 6.317-5.563 6.361-1.608.031-2.125-.953-3.963-.953-1.837 0-2.412.923-3.932.983-2.572.099-6.542-5.827-6.542-10.995 0-4.747 3.308-7.1 6.198-7.143 1.55-.028 3.014 1.045 3.959 1.045.949 0 2.727-1.29 4.596-1.101.782.033 2.979.315 4.389 2.377-3.741 2.442-3.158 7.549.858 9.426zm-5.222-17.607c-2.826.114-5.132 3.079-4.81 5.531 2.612.203 5.118-2.725 4.81-5.531z"/>
+                    </svg>
+                    macOS / Linux
+                </h4>
+                
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-gray-300 mb-2"><strong>1.</strong> Terminali Aç ve sudo nano Komutunu Çalıştır:</p>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span class="code-lang">Bash</span>
+                                <button onclick="copyCode(this, 'code-3')" class="copy-btn">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                    </svg>
+                                    Kopyala
+                                </button>
+                            </div>
+                            <div class="code-block">
+                                <code id="code-3">sudo nano /etc/hosts</code>
+                            </div>
+                        </div>
+                        <p class="text-gray-400 text-sm mt-2">
+                            ⚠️ Komut, bilgisayarının parolasını isteyecektir. Yazarken parola görünmez, bu normaldir. Yazıp Enter'a bas.
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-gray-300 mb-2"><strong>2.</strong> Değişikliği Ekle ve Kaydet:</p>
+                        <p class="text-gray-400 text-sm mb-2">Dosyanın en altına aşağıdaki satırı ekle:</p>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span class="code-lang">Hosts File</span>
+                                <button onclick="copyCode(this, 'code-4')" class="copy-btn">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                    </svg>
+                                    Kopyala
+                                </button>
+                            </div>
+                            <div class="code-block">
+                                <code id="code-4">127.0.0.1   [AdınızSoyadınız]</code>
+                            </div>
+                        </div>
+                        <p class="text-gray-400 text-sm mt-2">
+                            Kaydetmek için <kbd class="bg-gray-700 px-2 py-1 rounded text-xs">Ctrl + O</kbd> ve <kbd class="bg-gray-700 px-2 py-1 rounded text-xs">Enter</kbd>, 
+                            çıkmak için <kbd class="bg-gray-700 px-2 py-1 rounded text-xs">Ctrl + X</kbd>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verification -->
+            <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                <h4 class="text-green-300 font-bold mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Doğrulama
+                </h4>
+                <p class="text-gray-300 text-sm mb-2">Yaptığın işlemin çalışıp çalışmadığını kontrol edelim:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">CMD</span>
+                        <button onclick="copyCode(this, 'code-5')" class="copy-btn">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            Kopyala
+                        </button>
+                    </div>
+                    <div class="code-block">
+                        <code id="code-5">ping [kendi-adin]</code>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm mt-2">
+                    ✅ Eğer <code class="text-green-300">Pinging [kendi-adin] [127.0.0.1]</code> gibi bir yanıt görüyorsan, işlem başarılı!
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="step-card bg-gradient-to-r from-gray-800/50 to-gray-700/50 border border-gray-600 rounded-2xl p-6 md:p-8 mb-6">
+            <div class="flex items-start space-x-4 mb-6">
+                <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    1
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-white mb-2">Güvensiz İnternet Nasıl Görünür?</h3>
+                    <p class="text-gray-400 text-sm">HTTP sunucusu ile şifresiz iletişim</p>
+                </div>
+            </div>
+
+            <div class="bg-orange-900/20 border border-orange-500/30 rounded-lg p-4 mb-6">
+                <h4 class="text-orange-300 font-bold mb-2">🎯 Amaç</h4>
+                <p class="text-gray-300 text-sm">
+                    SSL/TLS'in çözdüğü problemi anlamak için önce problemin kendisini, yani şifresiz iletişimi görmeliyiz. 
+                    Tarayıcının "Güvenli değil" diye işaretlediği basit bir web sunucusu çalıştıracağız.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-300 mb-2"><strong>1.</strong> <code class="text-cyan-300">http_server.py</code> dosyası oluştur:</p>
+                    <p class="text-gray-400 text-sm mb-2">Masaüstünde <code class="text-cyan-300">ssl_uygulama</code> klasörü oluştur ve içinde şu kodu içeren dosyayı kaydet:</p>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-lang">🐍 Python</span>
+                            <button onclick="copyCode(this, 'code-6')" class="copy-btn">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Kopyala
+                            </button>
+                        </div>
+                        <div class="code-block">
+                            <pre><code id="code-6">import http.server
+import socketserver
+
+PORT = 8000
+Handler = http.server.SimpleHTTPRequestHandler
+
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("Basit HTTP sunucusu http://[AdınızSoyadınız]:" + str(PORT) + " adresinde başlatıldı...")
+    print("Tarayıcıda 'Güvenli değil' uyarısını görmelisin.")
+    httpd.serve_forever()</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-gray-300 mb-2"><strong>2.</strong> Sunucuyu başlat:</p>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-lang">CMD</span>
+                            <button onclick="copyCode(this, 'code-7')" class="copy-btn">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Kopyala
+                            </button>
+                        </div>
+                        <div class="code-block">
+                            <code id="code-7">python http_server.py</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-gray-300 mb-2"><strong>3.</strong> Sonucu İncele:</p>
+                    <ul class="list-disc list-inside text-gray-400 text-sm ml-4 space-y-1">
+                        <li>Tarayıcını aç ve <code class="text-cyan-300">http://[kendi-adin]:8000</code> adresine git</li>
+                        <li>Adres çubuğundaki <span class="text-red-400">"Güvenli değil"</span> uyarısını fark et</li>
+                        <li>Bu uyarı, bu siteyle arandaki tüm verinin (parolalar, form bilgileri vb.) şifresiz olarak gittiği anlamına gelir</li>
+                        <li>Sunucuyu <kbd class="bg-gray-700 px-2 py-1 rounded text-xs">Ctrl+C</kbd> ile durdur</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card bg-gradient-to-r from-gray-800/50 to-gray-700/50 border border-gray-600 rounded-2xl p-6 md:p-8 mb-6">
+            <div class="flex items-start space-x-4 mb-6">
+                <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-yellow-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    2
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-white mb-2">Kendi Dijital Noter'ini (CA) Kurmak</h3>
+                    <p class="text-gray-400 text-sm">Certificate Authority (Sertifika Otoritesi) oluşturma</p>
+                </div>
+            </div>
+
+            <div class="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4 mb-6">
+                <h4 class="text-yellow-300 font-bold mb-2">💡 Kavramsal Açıklama</h4>
+                <p class="text-gray-300 text-sm leading-relaxed">
+                    Tarayıcılar, web sitelerinin kimliğine <strong>Sertifika Otoriteleri (CA)</strong> adı verilen, 
+                    dünyaca güvenilir dijital noterler sayesinde güvenir. Bir CA, bir web sitesinin kimliğini doğrular ve ona kefil olarak bir SSL sertifikası verir. 
+                    Let's Encrypt, DigiCert gibi firmalar bu işi yapar. Şimdi, biz kendi noterimizi, <strong>Marmara University CA</strong>'yı kuracağız!
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-300 mb-2"><strong>1.</strong> CA'nın Gizli Mührünü Oluştur (<code class="text-green-300">ca.key</code>):</p>
+                    <p class="text-gray-400 text-sm mb-2">Bu, sertifikaları imzalamak için kullanılacak, parola ile korunan gizli anahtardır.</p>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-lang">OpenSSL</span>
+                            <button onclick="copyCode(this, 'code-8')" class="copy-btn">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Kopyala
+                            </button>
+                        </div>
+                        <div class="code-block">
+                            <code id="code-8">openssl genrsa -aes256 -out ca.key 2048</code>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-2">⚠️ Unutmayacağın bir parola belirle</p>
+                </div>
+
+                <div>
+                    <p class="text-gray-300 mb-2"><strong>2.</strong> CA'nın Resmi Kimliğini Oluştur (<code class="text-green-300">ca.pem</code>):</p>
+                    <p class="text-gray-400 text-sm mb-2">Bu, CA'nın kimliğini ve açık anahtarını içeren, herkesle paylaşılabilen kök sertifikadır.</p>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-lang">OpenSSL</span>
+                            <button onclick="copyCode(this, 'code-9')" class="copy-btn">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Kopyala
+                            </button>
+                        </div>
+                        <div class="code-block">
+                            <code id="code-9">openssl req -x509 -new -nodes -key ca.key -sha256 -days 1024 -out ca.pem</code>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-2">📝 "Common Name" (CN) sorusuna <strong>Marmara University CA</strong> yaz</p>
+                </div>
+            </div>
+
+            <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-4 mt-6">
+                <h4 class="text-green-300 font-bold mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Doğrulama
+                </h4>
+                <p class="text-gray-300 text-sm mb-2">CA'nın kimliğini görüntüle:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Bash</span>
+                        <button onclick="copyCode(this, 'code-10')" class="copy-btn">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            Kopyala
+                        </button>
+                    </div>
+                    <div class="code-block">
+                        <code id="code-10">cat ca.pem</code>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm mt-2">
+                    ✅ Ekranda <code class="text-green-300">-----BEGIN CERTIFICATE-----</code> ile başlayan metin, CA'nın resmi sertifikasıdır.
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card bg-gradient-to-r from-gray-800/50 to-gray-700/50 border border-gray-600 rounded-2xl p-6 md:p-8 mb-6">
+            <div class="flex items-start space-x-4 mb-6">
+                <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-green-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    3
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-white mb-2">Sunucun İçin Kimlik Başvurusu (CSR) Hazırlama</h3>
+                    <p class="text-gray-400 text-sm">Certificate Signing Request oluşturma</p>
+                </div>
+            </div>
+
+            <p class="text-gray-300 mb-6">
+                Şimdi, kendi adına çalışacak sunucun için dijital noterimize resmi bir kimlik başvurusu yapacaksın.
+            </p>
+
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-300 mb-2"><strong>1.</strong> Sunucunun Gizli Anahtarını Oluştur (<code class="text-cyan-300">server.key</code>):</p>
+                    <p class="text-gray-400 text-sm mb-2">Bu anahtar, sunucuya gelen şifreli veriyi çözmek için kullanılır ve asla paylaşılmaz.</p>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-lang">OpenSSL</span>
+                            <button onclick="copyCode(this, 'code-11')" class="copy-btn">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Kopyala
+                            </button>
+                        </div>
+                        <div class="code-block">
+                            <code id="code-11">openssl genrsa -out server.key 2048</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-gray-300 mb-2"><strong>2.</strong> Resmi Başvuru Formunu Doldur (<code class="text-cyan-300">server.csr</code>):</p>
+                    <p class="text-gray-400 text-sm mb-2">Bu form (CSR), kimlik bilgilerini ve sunucunun açık anahtarını içerir.</p>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-lang">OpenSSL</span>
+                            <button onclick="copyCode(this, 'code-12')" class="copy-btn">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Kopyala
+                            </button>
+                        </div>
+                        <div class="code-block">
+                            <code id="code-12">openssl req -new -key server.key -out server.csr</code>
+                        </div>
+                    </div>
+                    <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-3 mt-3">
+                        <p class="text-red-300 text-sm font-bold">⚠️ ÇOK ÖNEMLİ:</p>
+                        <ul class="list-disc list-inside text-gray-300 text-sm ml-4 space-y-1 mt-2">
+                            <li>"Common Name (CN)" alanına, Adım 0'da hosts dosyasına yazdığın ismin birebir aynısını girmelisin</li>
+                            <li>"A challenge password" kısmını boş bırakıp Enter'a bas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-4 mt-6">
+                <h4 class="text-green-300 font-bold mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Doğrulama
+                </h4>
+                <p class="text-gray-300 text-sm mb-2">Başvuru formunun içeriğini incele:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">OpenSSL</span>
+                        <button onclick="copyCode(this, 'code-13')" class="copy-btn">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            Kopyala
+                        </button>
+                    </div>
+                    <div class="code-block">
+                        <code id="code-13">openssl req -in server.csr -text -noout</code>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm mt-2">
+                    ✅ Çıktıda <code class="text-green-300">Subject:</code> kısmında kendi adını ve "Public Key" bölümünü göreceksin. 
+                    Bu formda gizli anahtarının olmadığını fark et.
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card bg-gradient-to-r from-gray-800/50 to-gray-700/50 border border-gray-600 rounded-2xl p-6 md:p-8 mb-6">
+            <div class="flex items-start space-x-4 mb-6">
+                <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    4
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-white mb-2">Başvuruyu Onaylatıp Resmi Sertifikayı Alma</h3>
+                    <p class="text-gray-400 text-sm">CA ile sertifikayı imzalama</p>
+                </div>
+            </div>
+
+            <p class="text-gray-300 mb-6">
+                Bu adımda, Noter'imiz (Marmara University CA), sunucunun başvurusunu kendi gizli mührüyle imzalayacak ve sana 
+                resmi kimlik kartını, yani <code class="text-blue-300">server.crt</code> dosyasını verecek.
+            </p>
+
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-300 mb-2"><strong>Sertifikayı İmzala:</strong></p>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-lang">OpenSSL</span>
+                            <button onclick="copyCode(this, 'code-14')" class="copy-btn">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Kopyala
+                            </button>
+                        </div>
+                        <div class="code-block">
+                            <code id="code-14">openssl x509 -req -in server.csr -CA ca.pem -CAkey ca.key -CAcreateserial -out server.crt -days 500 -sha256</code>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-2">⚠️ Komut, Adım 2'de belirlediğin CA parolasını soracaktır</p>
+                </div>
+            </div>
+
+            <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mt-6">
+                <h4 class="text-blue-300 font-bold mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Doğrulama (En Önemli An!)
+                </h4>
+                <p class="text-gray-300 text-sm mb-2">Resmi kimlik kartının içini okuyalım:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">OpenSSL</span>
+                        <button onclick="copyCode(this, 'code-15')" class="copy-btn">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            Kopyala
+                        </button>
+                    </div>
+                    <div class="code-block">
+                        <code id="code-15">openssl x509 -in server.crt -text -noout</code>
+                    </div>
+                </div>
+                <p class="text-gray-300 text-sm font-bold mb-2">Çıktıda şu iki alanı bul:</p>
+                <ul class="list-disc list-inside text-gray-400 text-sm ml-4 space-y-2">
+                    <li><strong class="text-blue-300">Issuer</strong> (Düzenleyen/Kefil): <code class="text-blue-300">CN = Marmara University CA</code> - Sertifikayı imzalayan Noter'in kimliği</li>
+                    <li><strong class="text-blue-300">Subject</strong> (Konu/Sahip): <code class="text-blue-300">CN = [kendi-adin]</code> - Sertifikanın kime ait olduğu</li>
+                </ul>
+                <div class="bg-blue-800/30 rounded-lg p-3 mt-3">
+                    <p class="text-blue-200 text-sm">
+                        🔑 <strong>Güven zincirinin temeli:</strong> Tarayıcı, Subject'in adres çubuğuyla eşleştiğini kontrol eder, 
+                        sonra Issuer'a bakıp "Ben bu notere güveniyor muyum?" diye sorar.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="step-card bg-gradient-to-r from-gray-800/50 to-gray-700/50 border border-gray-600 rounded-2xl p-6 md:p-8 mb-6">
+            <div class="flex items-start space-x-4 mb-6">
+                <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    5
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-white mb-2">Güvenli Sunucuyu Çalıştırma</h3>
+                    <p class="text-gray-400 text-sm">HTTPS sunucusu ile şifreli bağlantı</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-300 mb-2"><strong>1.</strong> <code class="text-purple-300">server.py</code> dosyası oluştur:</p>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-lang">🐍 Python</span>
+                            <button onclick="copyCode(this, 'code-16')" class="copy-btn">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Kopyala
+                            </button>
+                        </div>
+                        <div class="code-block">
+                            <pre><code id="code-16">import http.server
+import ssl
+
+PORT = 4443
+Handler = http.server.SimpleHTTPRequestHandler
+
+httpd = http.server.HTTPServer(('', PORT), Handler)
+httpd.socket = ssl.wrap_socket(httpd.socket,
+                                certfile='server.crt',
+                                keyfile='server.key',
+                                server_side=True)
+
+print("Güvenli HTTPS sunucusu https://[AdınızSoyadınız]:" + str(PORT) + " adresinde başlatıldı...")
+httpd.serve_forever()</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-gray-300 mb-2"><strong>2.</strong> Sunucuyu başlat:</p>
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-lang">CMD</span>
+                            <button onclick="copyCode(this, 'code-17')" class="copy-btn">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Kopyala
+                            </button>
+                        </div>
+                        <div class="code-block">
+                            <code id="code-17">python server.py</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4 mt-6">
+                <h4 class="text-purple-300 font-bold mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    Son Değerlendirme
+                </h4>
+                <p class="text-gray-300 text-sm mb-3">
+                    Tarayıcını açıp <code class="text-purple-300">https://[kendi-adin]:4443</code> adresine git. Karşına çıkan hata ekranı üzerinden şu farkı düşün:
+                </p>
+                
+                <div class="space-y-3">
+                    <div class="bg-red-800/30 rounded-lg p-3">
+                        <p class="text-red-300 font-bold text-sm">❌ HTTP Sunucusu ("Güvenli Değil"):</p>
+                        <p class="text-gray-300 text-sm">Ne şifreleme vardı ne de kimlik kanıtı.</p>
+                    </div>
+                    
+                    <div class="bg-yellow-800/30 rounded-lg p-3">
+                        <p class="text-yellow-300 font-bold text-sm">⚠️ HTTPS Sunucusu ("Bağlantınız Gizli Değil"):</p>
+                        <p class="text-gray-300 text-sm mb-2">Bu hata farklı! Anlamı:</p>
+                        <p class="text-gray-400 text-sm italic">
+                            "Bağlantıyı şifreleyebilirim, ancak sitenin kimliğini kanıtlayan noteri (Marmara University CA) 
+                            tanımadığım için kimliğinden emin değilim."
+                        </p>
+                    </div>
+                    
+                    <div class="bg-green-800/30 rounded-lg p-3">
+                        <p class="text-green-300 font-bold text-sm mb-2">✅ "Gelişmiş → Devam Et" dediğinde:</p>
+                        <ul class="list-disc list-inside text-gray-300 text-sm ml-4 space-y-1">
+                            <li>Tarayıcıya "Kimlik doğrulamasını bu seferlik es geç, şifreli bağlantıyı kur" demiş olursun</li>
+                            <li>Adres çubuğundaki kilit simgesi artık bağlantının şifreli olduğunu gösterir!</li>
+                            <li>HTTPS'nin "S" harfi çalışıyor demektir 🔒</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div class="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/30 rounded-2xl p-6 md:p-8 text-center">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-3xl font-bold text-white mb-3">Tebrikler!</h2>
+            <p class="text-xl text-gray-300 mb-4">
+                İnternetin en temel güvenlik mekanizmasını kendi ellerinle kurdun ve çalıştırdın.
+            </p>
+            <div class="bg-green-900/20 rounded-lg p-4 max-w-2xl mx-auto">
+                <p class="text-green-200 text-sm leading-relaxed">
+                    Artık SSL/TLS sertifikalarının nasıl çalıştığını, güven zincirinin nasıl kurulduğunu ve 
+                    HTTPS'nin neden önemli olduğunu pratik yaparak öğrendin. Bu bilgi, modern web güvenliğinin temelini anlamak için kritik öneme sahiptir.
+                </p>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="mt-8 flex justify-center">
+            <a href="../index.html" class="inline-flex items-center bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white font-semibold px-8 py-4 rounded-lg transition shadow-lg">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                Ana Sayfaya Dön
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 border-t border-gray-700 py-8">
+        <div class="container mx-auto px-4 text-center text-gray-400 text-sm">
+            <p>© 2025 Zero Trust - Kriptografi Eğitim Platformu</p>
+            <p class="mt-2">SSL/TLS Sertifikası Atölyesi</p>
+        </div>
+    </footer>
+
+    <script>
+        function copyCode(button, codeId) {
+            const codeElement = document.getElementById(codeId);
+            const code = codeElement.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                // Change button text and style
+                const originalHTML = button.innerHTML;
+                button.innerHTML = `
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Kopyalandı!
+                `;
+                button.classList.add('copied');
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Kopyalama hatası:', err);
+                alert('Kod kopyalanamadı. Lütfen manuel olarak kopyalayın.');
+            });
+        }
+    </script>
+
+</body>
+</html>
